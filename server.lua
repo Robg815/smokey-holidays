@@ -19,11 +19,12 @@ local function leaderboardKey()
     return leaderboardConfig().EventKey or 'seasonal'
 end
 
-local function notify(src, description, ntype)
+local function notify(src, description, ntype, duration)
     TriggerClientEvent('smokey-holidays:client:notify', src, {
         title = eventConfig().eventName or 'Holiday Event',
         description = description,
-        type = ntype or 'inform'
+        type = ntype or 'inform',
+        duration = duration or 5000
     })
 end
 
@@ -229,7 +230,7 @@ local function initializeState()
             index = index,
             coords = collectibleCfg.coords,
             heading = collectibleCfg.heading or 0.0,
-            model = (Config.UseRare and collectibleCfg.rare and Config.RarePropModel) or Config.PropModel,
+            model = (Config.PropModels and Config.PropModels[1]) or Config.PropModel,
             rare = collectibleCfg.rare == true,
             collected = false
         }
