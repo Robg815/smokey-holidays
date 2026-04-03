@@ -90,7 +90,7 @@ Config.Settings = {
             { type = 'item', name = 'goldbar', amount = 1, chance = 15 },
             { type = 'item', name = 'medikit', amount = 1, chance = 10 }
         }
-    }, -- ✅ FIXED HERE
+    }, 
 
     rewards = {
         { type = 'item', name = 'lc_coffee', amount = 1, chance = 20 },
