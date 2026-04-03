@@ -70,29 +70,41 @@ local function clearEggModelCache()
     EggModels = {}
 end
 
-local function stopRareParticle(index)
+local function stopParticle(index)
     if RareParticles[index] then
         StopParticleFxLooped(RareParticles[index], false)
         RareParticles[index] = nil
     end
 end
 
-local function startRareParticle(index, entity)
-    local rareCfg = Config.Settings and Config.Settings.rareCollectibles
-    if not rareCfg or not rareCfg.particles or not rareCfg.particles.enabled then return end
+local function startParticle(index, entity, isRare)
     if RareParticles[index] then return end
     if not entity or not DoesEntityExist(entity) then return end
 
-    local p = rareCfg.particles
-    if not loadPtfx(p.dict) then return end
+    local particleCfg = nil
 
-    UseParticleFxAssetNextCall(p.dict)
+    if isRare then
+        local rareCfg = Config.Settings and Config.Settings.rareCollectibles
+        if rareCfg and rareCfg.particles and rareCfg.particles.enabled then
+            particleCfg = rareCfg.particles
+        end
+    else
+        local normalCfg = Config.Settings and Config.Settings.normalParticles
+        if normalCfg and normalCfg.enabled then
+            particleCfg = normalCfg
+        end
+    end
+
+    if not particleCfg then return end
+    if not loadPtfx(particleCfg.dict) then return end
+
+    UseParticleFxAssetNextCall(particleCfg.dict)
     RareParticles[index] = StartParticleFxLoopedOnEntity(
-        p.name,
+        particleCfg.name,
         entity,
-        p.offset.x, p.offset.y, p.offset.z,
-        p.rotation.x, p.rotation.y, p.rotation.z,
-        p.scale or 0.25,
+        particleCfg.offset.x, particleCfg.offset.y, particleCfg.offset.z,
+        particleCfg.rotation.x, particleCfg.rotation.y, particleCfg.rotation.z,
+        particleCfg.scale or 0.20,
         false, false, false
     )
 end
@@ -106,7 +118,7 @@ local function removeEggTarget(index)
 end
 
 local function clearEgg(index)
-    stopRareParticle(index)
+    stopParticle(index)
     removeEggTarget(index)
 
     local entity = SpawnedEntities[index]
@@ -228,9 +240,7 @@ local function spawnLocalEgg(index, state)
 
     SpawnedEntities[index] = entity
 
-    if state.rare then
-        startRareParticle(index, entity)
-    end
+    startParticle(index, entity, state.rare == true)
 
     addEggTarget(index, entity, state.rare == true)
 end
@@ -258,7 +268,38 @@ local function refreshAllEggs()
 end
 
 RegisterNetEvent('smokey-holidays:client:notify', function(data)
-    lib.notify(data)
+    local title = (data and data.title) or 'Holiday Event'
+    local message = (data and data.description) or ''
+    local ntype = (data and data.type) or 'info'
+    local duration = (data and data.duration) or 5000
+
+    local typeMap = {
+        inform = 'info',
+        info = 'info',
+        success = 'success',
+        warning = 'warning',
+        error = 'error'
+    }
+
+    local okokState = GetResourceState('okokNotify')
+
+    if okokState == 'started' or okokState == 'starting' then
+        exports['okokNotify']:Alert(
+            title,
+            message,
+            duration,
+            typeMap[ntype] or 'info',
+            true
+        )
+    else
+        -- fallback to ox_lib
+        lib.notify({
+            title = title,
+            description = message,
+            type = typeMap[ntype] or 'info',
+            duration = duration
+        })
+    end
 end)
 
 RegisterNetEvent('smokey-holidays:client:setCollectedState', function(state)
@@ -274,22 +315,31 @@ end)
 RegisterNetEvent('smokey-holidays:client:playCollectFx', function(index, coords, isRare)
     if not coords then return end
 
+    local particleCfg = nil
+
     if isRare then
         local rareCfg = Config.Settings and Config.Settings.rareCollectibles
         if rareCfg and rareCfg.particles and rareCfg.particles.enabled then
-            local p = rareCfg.particles
-            if loadPtfx(p.dict) then
-                UseParticleFxAssetNextCall(p.dict)
-                StartParticleFxNonLoopedAtCoord(
-                    p.name,
-                    coords.x, coords.y, coords.z + 0.05,
-                    0.0, 0.0, 0.0,
-                    p.scale or 0.35,
-                    false, false, false
-                )
-            end
+            particleCfg = rareCfg.particles
+        end
+    else
+        local normalCfg = Config.Settings and Config.Settings.normalParticles
+        if normalCfg and normalCfg.enabled then
+            particleCfg = normalCfg
         end
     end
+
+    if not particleCfg then return end
+    if not loadPtfx(particleCfg.dict) then return end
+
+    UseParticleFxAssetNextCall(particleCfg.dict)
+    StartParticleFxNonLoopedAtCoord(
+        particleCfg.name,
+        coords.x, coords.y, coords.z + 0.05,
+        particleCfg.rotation.x or 0.0, particleCfg.rotation.y or 0.0, particleCfg.rotation.z or 0.0,
+        particleCfg.scale or 0.20,
+        false, false, false
+    )
 end)
 
 RegisterNetEvent('smokey-holidays:client:openLeaderboard', function(rows)
@@ -357,6 +407,7 @@ CreateThread(function()
     while true do
         local sleep = 1000
         local pedCoords = GetEntityCoords(PlayerPedId())
+        local time = GetGameTimer() / 1000
 
         local normalGlowCfg = Config.Settings and Config.Settings.normalGlow
         local rareCfg = Config.Settings and Config.Settings.rareCollectibles
@@ -371,9 +422,13 @@ CreateThread(function()
 
                 if dist < 20.0 then
                     local glowCfg = nil
+                    local pulseSpeed = 1.5
+                    local pulseStrength = 0.25
 
                     if state.rare and rareGlowCfg and rareGlowCfg.enabled then
                         glowCfg = rareGlowCfg
+                        pulseSpeed = 2.2
+                        pulseStrength = 0.35
                     elseif not state.rare and normalGlowCfg and normalGlowCfg.enabled then
                         glowCfg = normalGlowCfg
                     end
@@ -381,7 +436,12 @@ CreateThread(function()
                     if glowCfg then
                         sleep = 0
 
-                        local minDim, maxDim = GetModelDimensions(GetEntityModel(entity))
+                        local pulse = (math.sin(time * pulseSpeed) + 1.0) / 2.0
+                        local scaleMultiplier = 1.0 + (pulse * pulseStrength)
+                        local alphaMultiplier = 0.7 + (pulse * 0.5)
+                        local lightMultiplier = 0.7 + (pulse * 0.8)
+
+                        local minDim, _ = GetModelDimensions(GetEntityModel(entity))
                         local bottomZ = entityCoords.z + minDim.z + 0.02
                         local lightZ = bottomZ + 0.06
 
@@ -390,16 +450,23 @@ CreateThread(function()
                             entityCoords.x, entityCoords.y, bottomZ,
                             0.0, 0.0, 0.0,
                             0.0, 0.0, 0.0,
-                            glowCfg.markerScale.x, glowCfg.markerScale.y, glowCfg.markerScale.z,
-                            glowCfg.markerColor.r, glowCfg.markerColor.g, glowCfg.markerColor.b, glowCfg.markerColor.a,
+                            glowCfg.markerScale.x * scaleMultiplier,
+                            glowCfg.markerScale.y * scaleMultiplier,
+                            glowCfg.markerScale.z,
+                            glowCfg.markerColor.r,
+                            glowCfg.markerColor.g,
+                            glowCfg.markerColor.b,
+                            math.floor((glowCfg.markerColor.a or 150) * alphaMultiplier),
                             false, true, 2, false, nil, nil, false
                         )
 
                         DrawLightWithRange(
                             entityCoords.x, entityCoords.y, lightZ,
-                            glowCfg.lightColor.r, glowCfg.lightColor.g, glowCfg.lightColor.b,
-                            glowCfg.lightRange or 2.0,
-                            glowCfg.lightIntensity or 1.0
+                            glowCfg.lightColor.r,
+                            glowCfg.lightColor.g,
+                            glowCfg.lightColor.b,
+                            (glowCfg.lightRange or 2.0) * scaleMultiplier,
+                            (glowCfg.lightIntensity or 1.0) * lightMultiplier
                         )
                     end
                 end
