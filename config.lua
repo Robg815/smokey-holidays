@@ -4,7 +4,7 @@ Config.Debug = false
 
 Config.CashItem = 'cash'
 
-Config.PropModels = {            -- change for what prop is needed for holiday (must have tstudios_legion_easter to use configured props)
+Config.PropModels = {
     `tstudio_legionsquare_asset_egg01`,
     `tstudio_legionsquare_asset_egg02`,
     `tstudio_legionsquare_asset_egg03`,
@@ -15,7 +15,7 @@ Config.PropModels = {            -- change for what prop is needed for holiday (
     `tstudio_legionsquare_asset_egg08`,
     `tstudio_legionsquare_asset_egg09`,
     `tstudio_legionsquare_asset_egg10`,
-    `prop_alien_egg_01` -- default gta prop egg
+    `prop_alien_egg_01`
 }
 
 Config.UseRare = true
@@ -49,20 +49,29 @@ Config.Settings = {
 
     normalPoints = 1,
 
-        rareCollectibles = {
+    normalGlow = {
+        enabled = true,
+        markerType = 1,
+        markerScale = vec3(0.18, 0.18, 0.07),
+        markerColor = { r = 0, g = 120, b = 255, a = 160 },
+        lightColor = { r = 0, g = 120, b = 255 },
+        lightRange = 2.8,
+        lightIntensity = 4.0
+    },
+
+    normalParticles = {
+        enabled = true,
+        dict = 'core',
+        name = 'ent_amb_magic_blue',
+        scale = 0.20,
+        offset = vec3(0.0, 0.0, -0.20),
+        rotation = vec3(0.0, 0.0, 0.0)
+    },
+
+    rareCollectibles = {
         enabled = true,
         points = 5,
         rewardMultiplier = 2,
-
-        normalGlow = {
-            enabled = true,
-            markerType = 1,
-            markerScale = vec3(0.12, 0.12, 0.05),
-            markerColor = { r = 120, g = 200, b = 255, a = 90 },
-            lightColor = { r = 120, g = 200, b = 255 },
-            lightRange = 1.75,
-            lightIntensity = 2.5
-        }, 
 
         glow = {
             enabled = true,
@@ -90,7 +99,7 @@ Config.Settings = {
             { type = 'item', name = 'goldbar', amount = 1, chance = 15 },
             { type = 'item', name = 'medikit', amount = 1, chance = 10 }
         }
-    }, 
+    },
 
     rewards = {
         { type = 'item', name = 'lc_coffee', amount = 1, chance = 20 },
@@ -132,5 +141,11 @@ Config.Coords = {
     [27] = { coords = vec3(681.4825, -996.9814, 22.9111), heading = 0.0, rare = false },
     [28] = { coords = vec3(675.1328, -930.8517, 22.2361), heading = 0.0, rare = false },
     [29] = { coords = vec3(948.0574, 96.0657, 80.8748), heading = 0.0, rare = false },
-    [30] = { coords = vec3(286.5584, 213.4559, 104.7229), heading = 0.0, rare = false }
+    [30] = { coords = vec3(286.5584, 213.4559, 104.7229), heading = 0.0, rare = false },
+    [31] = { coords = vec3(-35.62, -1108.44, 26.42), heading = 0.0, rare = true },
+    [32] = { coords = vec3(-118.33, -1030.88, 27.27), heading = 0.0, rare = false },
+    [33] = { coords = vec3(-140.75, -945.18, 29.14), heading = 0.0, rare = true },
+    [34] = { coords = vec3(38.92, -1040.52, 29.34), heading = 0.0, rare = true },
+    
+    
 }
