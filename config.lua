@@ -4,7 +4,7 @@ Config.Debug = false
 
 Config.CashItem = 'cash'
 
-Config.PropModels = {
+Config.PropModels = {            -- change for what prop is needed for holiday (must have tstudios_legion_easter to use configured props)
     `tstudio_legionsquare_asset_egg01`,
     `tstudio_legionsquare_asset_egg02`,
     `tstudio_legionsquare_asset_egg03`,
