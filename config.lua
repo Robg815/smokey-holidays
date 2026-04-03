@@ -15,7 +15,7 @@ Config.PropModels = {            -- change for what prop is needed for holiday (
     `tstudio_legionsquare_asset_egg08`,
     `tstudio_legionsquare_asset_egg09`,
     `tstudio_legionsquare_asset_egg10`,
-    `prop_alien_egg_01`
+    `prop_alien_egg_01` -- default gta prop egg
 }
 
 Config.UseRare = true
