@@ -1,4 +1,4 @@
-smokey-holidays generic package
+smokey-holidays 
 
 Setup:
 1. Import smokey_holidays.sql
