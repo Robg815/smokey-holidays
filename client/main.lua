@@ -1,6 +1,14 @@
 -- Opens the holiday UI and relays the advent claim. The server decides everything; this only shows it.
 local open = false
 
+-- Short jump scare used by tricks at doors and by ghosts (camera shake, dark flash, sting)
+function HolidayScare()
+    ShakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.18)
+    AnimpostfxPlay('DeathFailMPDark', 0, false)
+    PlaySoundFrontend(-1, 'Bed', 'WastedSounds', true)
+    SetTimeout(900, function() AnimpostfxStop('DeathFailMPDark') end)
+end
+
 local function openUI()
     if open then return end
     local state = lib.callback.await('s2-holidays:getState', false)

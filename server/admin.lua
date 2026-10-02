@@ -80,6 +80,8 @@ local function build()
         clock = s and ('%02d:%02d:%02d'):format(s // 3600, s % 3600 // 60, s % 60) or nil,
         advent = Config.Advent and Config.Advent.enabled == true, holidays = list,
         ghosts = Ghosts and Ghosts.count or 0, ghostMax = Config.Ghosts and Config.Ghosts.maxActive or 0,
+        doors = Config.TrickOrTreat and Config.TrickOrTreat.enabled and #Config.TrickOrTreat.doors or 0,
+        flashlight = Config.Ghosts and Config.Ghosts.flashlight and Config.Ghosts.flashlight.required == true,
     }
 end
 
@@ -129,8 +131,8 @@ function actions.resetClaims(src, d)
     local p = exports.qbx_core:GetPlayer(src)
     if not p or not holidayCfg(d.id) then return 'Nothing to reset.' end
     local y = Dates.today()
-    local n = MySQL.update.await('DELETE FROM s2_holiday_claims WHERE citizenid = ? AND year = ? AND event IN (?, ?)',
-        { p.PlayerData.citizenid, y, d.id, d.id == 'christmas' and 'advent' or d.id })
+    local n = MySQL.update.await('DELETE FROM s2_holiday_claims WHERE citizenid = ? AND year = ? AND event IN (?, ?, ?, ?)',
+        { p.PlayerData.citizenid, y, d.id, d.id == 'christmas' and 'advent' or d.id, d.id .. '_door', d.id .. '_ghost' })
     return ('Removed %d of your claims.'):format(n or 0)
 end
 
@@ -177,7 +179,7 @@ function actions.resetContest()
     local y = Dates.today()
     local a = MySQL.update.await('DELETE FROM s2_holiday_points WHERE event = ? AND year = ?', { 'halloween', y }) or 0
     MySQL.update.await('DELETE FROM s2_holiday_winners WHERE event = ? AND year = ?', { 'halloween', y })
-    MySQL.update.await('DELETE FROM s2_holiday_claims WHERE event = ? AND year = ?', { 'halloween_ghost', y })
+    MySQL.update.await('DELETE FROM s2_holiday_claims WHERE event IN (?, ?) AND year = ?', { 'halloween_ghost', 'halloween_door', y })
     return ('Halloween contest reset (%d scores removed).'):format(a)
 end
 

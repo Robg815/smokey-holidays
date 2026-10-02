@@ -42,16 +42,47 @@ def bunting(cols,y0=12,sag=38):
 BAT=lambda x,y,s:f'<path d="M0 0c-6-12-18-16-36-8 6 0 10 4 12 10 4-2 8 0 10 6 4-4 10-4 14 0 2-6 6-8 10-6 2-6 6-10 12-10C-4-16 6-12 0 0z" transform="translate({x} {y}) scale({s})" fill="#0b0413"/>'
 
 # ---------------- scene backdrops (1200x520, drawn to be cropped to fit) ----------------
+def fogband(y,h,op,seed,col='#c8a8ff'):
+    r=random.Random(seed); return ''.join(f'<ellipse cx="{r.uniform(-50,1250):.0f}" cy="{y+r.uniform(-h/3,h/3):.0f}" rx="{r.uniform(160,340):.0f}" ry="{h*r.uniform(.35,.6):.0f}" fill="{col}" opacity="{op*r.uniform(.5,1):.2f}" filter="url(#blur)"/>' for _ in range(9))
+def mansion(x,y,s):
+    w='#ffb347'
+    sil=(f'<g transform="translate({x} {y}) scale({s})" fill="#0e0618">'
+        '<path d="M-150 0V-120H-110V-160L-80-200-50-160V-120H50V-150L90-230 130-150V-120H160V0Z"/>'
+        '<path d="M-20-120V-170L10-215 40-170V-120Z"/><path d="M8-212l2-30 2 30z"/><path d="M88-228l2-22 2 22z"/>'
+        '<path d="M-150-120L-130-140H160L170-120Z"/></g>')
+    win=''.join(f'<rect x="{x+wx*s:.0f}" y="{y+wy*s:.0f}" width="{14*s:.0f}" height="{20*s:.0f}" rx="{3*s:.0f}" fill="{w}" opacity="{o}" filter="url(#glow)"/>'
+        for wx,wy,o in ((-125,-100,.95),(-95,-100,.4),(-65,-150,.9),(-30,-60,.85),(5,-160,1),(40,-60,.35),(80,-180,.95),(110,-100,.9),(135,-60,.6),(-125,-50,.7)))
+    return sil+win
+def pumpkin(x,y,s):
+    return (f'<g transform="translate({x} {y}) scale({s})"><ellipse cx="0" cy="0" rx="46" ry="34" fill="#ff8a1f" filter="url(#pglow)" opacity=".55"/>'
+        '<path d="M0-30c-26 0-38 12-38 28s14 26 38 26 38-10 38-26-12-28-38-28z" fill="url(#pk)" stroke="#8a3a00" stroke-width="2"/>'
+        '<path d="M0-30c-11 4-13 50 0 54M0-30c11 4 13 50 0 54M-22-26c-9 8-9 40 0 48M22-26c9 8 9 40 0 48" fill="none" stroke="#8a3a00" stroke-opacity=".55" stroke-width="1.6"/>'
+        '<path d="M-2-29q0-12 9-16" stroke="#3a7d2a" stroke-width="5" fill="none" stroke-linecap="round"/>'
+        '<path d="M-20-8l8-8 6 9zM20-8l-8-8-6 9zM-20 8q20 14 40 0l-5-2-5 5-5-5-5 5-5-5-5 5-5-5z" fill="#ffe08a"/></g>')
+def fence(y):
+    b=f'<path d="M0 {y}H1200M0 {y+26}H1200" stroke="#120820" stroke-width="5"/>'
+    for x in range(10,1200,22): b+=f'<path d="M{x} {y+44}V{y-14}l5-10 5 10V{y+44}z" fill="#120820"/>'
+    return b
 def halloween():
-    d=lg('s',[(0,'#12071f'),(.55,'#3a1450'),(1,'#6a2f5c')])+rg('m',[(0,'#fff6d8'),(.7,'#f7c66a'),(1,'#e39b3a')],.4,.4,.6)+rg('g',[(0,'rgba(255,170,60,.5)'),(1,'rgba(255,170,60,0)')])
-    b=sky('s')+stars(80,300,2)+'<circle cx="960" cy="120" r="170" fill="url(#g)"/><circle cx="960" cy="120" r="72" fill="url(#m)"/>'
-    b+=''.join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#b8741f" opacity=".25"/>' for x,y,r in ((940,100,12),(985,140,9),(950,150,6),(990,95,7)))
-    b+=BAT(930,90,1)+BAT(1010,60,.7)+BAT(880,150,.55)+BAT(300,70,.8)+BAT(520,120,.5)
-    b+=hills(390,30,'#1c0d2a',3)+tree(90,470,1.4,7,'#0b0413')+tree(1130,480,1.2,11,'#0b0413')+tree(640,430,.55,4,'#140a1e')+hills(455,16,'#0d0616',9)
-    for i,x in enumerate(range(140,1100,95)):
-        y=470+(i*13)%22; b+=f'<path d="M{x} {y}v-30a13 13 0 0126 0v30z" fill="#241634" stroke="#5a3a7a" stroke-width="2"/>'
-        if i%3==0: b+=f'<path d="M{x+13} {y-28}v-8M{x+8} {y-32}h10" stroke="#5a3a7a" stroke-width="2"/>'
-    return svg(b+'<rect y="492" width="1200" height="28" fill="#07030c"/>',d)
+    d=(lg('s',[(0,'#0b0418'),(.45,'#2a0f45'),(.78,'#6b2463'),(1,'#c4573e')])+rg('m',[(0,'#fffbe8'),(.6,'#ffe2a0'),(1,'#f0a94a')],.42,.38,.62)
+       +rg('g',[(0,'rgba(255,190,110,.55)'),(.5,'rgba(255,140,80,.18)'),(1,'rgba(255,140,80,0)')])+lg('pk',[(0,'#ffb04a'),(1,'#d4560a')])
+       +lg('hz',[(0,'rgba(255,120,60,0)'),(1,'rgba(255,120,60,.35)')])
+       +'<filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>'
+       +'<filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+       +'<filter id="pglow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="14"/></filter>')
+    b=sky('s')+stars(120,320,2)+'<rect y="250" width="1200" height="200" fill="url(#hz)"/>'
+    b+='<circle cx="930" cy="130" r="230" fill="url(#g)"/><circle cx="930" cy="130" r="78" fill="url(#m)"/>'
+    b+=''.join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#c98a3a" opacity=".22"/>' for x,y,r in ((905,105,13),(955,150,10),(920,160,6),(965,105,8),(940,125,4)))
+    b+='<g fill="#2a1240" opacity=".75"><ellipse cx="880" cy="150" rx="120" ry="9"/><ellipse cx="990" cy="168" rx="90" ry="7"/><ellipse cx="820" cy="96" rx="70" ry="5"/></g>'
+    b+=skyline(5,400,40,150,'#1a0a2c',lit='#ff9f4a',p=.18,x0=0,x1=560)
+    b+=hills(360,40,'#160828',3)+mansion(930,330,1.05)+hills(420,20,'#0f0619',8)
+    b+=fogband(400,90,.18,4)+tree(70,470,1.5,7,'#07020d')+tree(1150,480,1.25,11,'#07020d')+tree(470,430,.6,4,'#0f0619')
+    for i,x in enumerate(range(160,1080,110)):
+        y=462+(i*17)%20; b+=f'<path d="M{x} {y}v-28a12 12 0 0124 0v28z" fill="#1f1230" stroke="#4a2a66" stroke-width="2"/>'
+    b+=fence(440)+fogband(470,70,.22,9,'#b48cff')
+    b+=BAT(905,95,1.1)+BAT(1010,60,.7)+BAT(860,170,.55)+BAT(320,80,.8)+BAT(560,130,.5)+BAT(180,150,.4)
+    b+=pumpkin(60,488,.9)+pumpkin(1140,492,.75)
+    return svg(b+'<rect y="496" width="1200" height="24" fill="#05020a"/>',d)
 def valentines():
     r=random.Random(3); d=lg('s',[(0,'#3a0a22'),(1,'#7a1a44')])+lg('c',[(0,'#4a0d2a'),(.5,'#8c2058'),(1,'#4a0d2a')],False)+rg('bk',[(0,'rgba(255,170,210,.55)'),(1,'rgba(255,170,210,0)')])
     g=lambda x:38+50*abs(math.sin(x/1200*math.pi*3)); b=sky('s')+bokeh(3,22,'bk')+heart(600,250,9,'#ff6fb5',0,.07)
@@ -150,3 +181,84 @@ def trophy():
     return svg(b,d,'0 0 120 152','xMidYMid meet')
 out('halloween','trophy',trophy())
 print(sorted(os.listdir(R)))
+
+# ---------------- UI art: brand mark, hero scenes, map card, reward illustrations, admin wallpaper ----------------
+GLOW='<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+SOFT='<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>'
+def brand():
+    d=lg('bg',[(0,'#7b5cff'),(1,'#ff5fa2')],False)+lg('hl',[(0,'rgba(255,255,255,.55)'),(1,'rgba(255,255,255,0)')])
+    b=('<rect x="4" y="4" width="92" height="92" rx="26" fill="url(#bg)"/><rect x="4" y="4" width="92" height="46" rx="26" fill="url(#hl)" opacity=".5"/>'
+       '<path d="M30 64c4 6 11 9 19 9 10 0 17-5 17-13 0-18-34-10-34-27 0-7 7-12 16-12 7 0 12 3 15 7" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>'
+       '<circle cx="72" cy="28" r="7" fill="#fff"/>')
+    return svg(b,d,'0 0 100 100','xMidYMid meet')
+def christmas():
+    d=(lg('s',[(0,'#06102a'),(.6,'#173a6a'),(1,'#3b6aa0')])+rg('gl',[(0,'rgba(255,214,140,.7)'),(1,'rgba(255,214,140,0)')])+SOFT
+       +'<filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
+    r=random.Random(12)
+    b=sky('s')+stars(70,260,5)+'<path d="M0 120Q300 60 600 140T1200 90" stroke="#7affc4" stroke-opacity=".18" stroke-width="40" fill="none" filter="url(#soft)"/>'
+    b+=hills(360,30,'#d8e6f5',4)+skyline(14,420,40,120,'#12244a',lit='#ffd27a',p=.3,x0=0,x1=1200)
+    b+='<g filter="url(#glow)">'+''.join(f'<circle cx="{x}" cy="{300+18*math.sin(x/70):.0f}" r="3.5" fill="{["#ff5a6e","#ffd36b","#6dffb0","#8fd8ff"][i%4]}"/>' for i,x in enumerate(range(10,1200,34)))+'</g>'
+    b+=f'<path d="M0 {300+18*math.sin(0):.0f}'+''.join(f'L{x} {300+18*math.sin(x/70):.0f}' for x in range(10,1201,10))+'" stroke="#0a1530" stroke-width="1.5" fill="none" opacity=".6"/>'
+    b+=hills(450,18,'#eef5ff',9)
+    for x,sc in ((150,1.3),(260,.9),(1000,1.4),(1110,1.0),(640,.7)):
+        b+=f'<g transform="translate({x} 470) scale({sc})"><circle cx="0" cy="-60" r="60" fill="url(#gl)"/><path d="M0-120L-40-50H-20L-50 0H50L20-50H40Z" fill="#1d5a3a" stroke="#0e3a24" stroke-width="2"/><path d="M0-132l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#ffd36b"/>'
+        b+=''.join(f'<circle cx="{r.uniform(-30,30):.0f}" cy="{r.uniform(-90,-10):.0f}" r="3.5" fill="{r.choice(["#ff5a6e","#ffd36b","#8fd8ff"])}" filter="url(#glow)"/>' for _ in range(7))+'</g>'
+    b+=''.join(f'<circle cx="{r.uniform(0,1200):.0f}" cy="{r.uniform(0,500):.0f}" r="{r.uniform(1,3.2):.1f}" fill="#fff" opacity="{r.uniform(.4,.95):.2f}"/>' for _ in range(160))
+    return svg(b,d)
+def hero_default():
+    d=lg('s',[(0,'#0b1022'),(1,'#1b2347')])+rg('a',[(0,'rgba(123,92,255,.55)'),(1,'rgba(123,92,255,0)')])+rg('c',[(0,'rgba(95,243,255,.4)'),(1,'rgba(95,243,255,0)')])
+    b=sky('s')+'<circle cx="300" cy="80" r="360" fill="url(#a)"/><circle cx="980" cy="420" r="380" fill="url(#c)"/>'+stars(70,520,9)
+    b+=''.join(f'<path d="M0 {y}Q300 {y-60} 600 {y}T1200 {y}" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="2"/>' for y in range(200,520,26))
+    return svg(b,d)
+def citymap():
+    d=lg('bg',[(0,'#1c0d2e'),(1,'#0e0618')])+rg('pg',[(0,'rgba(255,138,31,.75)'),(1,'rgba(255,138,31,0)')])
+    r=random.Random(21)
+    b='<rect width="400" height="220" rx="18" fill="url(#bg)"/>'
+    b+='<path d="M-10 160C60 140 90 190 160 170S260 120 330 140 410 120 410 120V230H-10Z" fill="#160a28"/>'
+    b+='<path d="M0 205C70 190 120 214 190 196S300 180 400 196" stroke="#2a5a8a" stroke-width="10" fill="none" opacity=".55"/>'
+    for i in range(0,400,40): b+=f'<path d="M{i} 0V220" stroke="#ffffff" stroke-opacity=".04"/>'
+    for j in range(0,220,40): b+=f'<path d="M0 {j}H400" stroke="#ffffff" stroke-opacity=".04"/>'
+    b+='<g stroke="#3a2456" stroke-width="7" fill="none" stroke-linecap="round"><path d="M20 60L130 90 220 70 380 110"/><path d="M110 10L130 90 120 200"/><path d="M260 10L220 70 250 190"/><path d="M30 150L120 140 250 150 370 175"/></g>'
+    b+='<g stroke="#ff8a1f" stroke-width="2.5" stroke-dasharray="6 7" fill="none" opacity=".8"><path d="M60 70Q120 120 180 85T300 120 350 160"/></g>'
+    for x,y in ((60,70),(180,85),(300,120),(350,160),(120,165),(245,40)):
+        b+=f'<circle cx="{x}" cy="{y}" r="22" fill="url(#pg)"/><path d="M{x} {y+12}c-10-11-14-17-14-23a14 14 0 0128 0c0 6-4 12-14 23z" fill="#ff8a1f" stroke="#7a3300" stroke-width="1.5"/><circle cx="{x}" cy="{y-11}" r="5" fill="#2a0f3e"/>'
+    return svg(b,d,'0 0 400 220','xMidYMid slice')
+def reward(kind):
+    d=rg('halo',[(0,'rgba(255,255,255,.28)'),(1,'rgba(255,255,255,0)')])+lg('pk',[(0,'#ffb04a'),(1,'#d4560a')])+lg('gold',[(0,'#fff1b0'),(.5,'#f5c542'),(1,'#a8740c')])+GLOW
+    b='<circle cx="80" cy="80" r="78" fill="url(#halo)"/>'
+    if kind=='candy':
+        b+=('<path d="M42 64h76l-8 70H50z" fill="#7b3fb0" stroke="#3a1458" stroke-width="3"/><path d="M42 64l10-12h56l10 12" fill="#9a5ad0" stroke="#3a1458" stroke-width="3"/>'
+            '<path d="M60 100q20 16 40 0" stroke="#ffd36b" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="66" cy="88" r="5" fill="#ffd36b"/><circle cx="94" cy="88" r="5" fill="#ffd36b"/>'
+            '<g transform="rotate(-25 56 46)"><rect x="40" y="38" width="32" height="16" rx="8" fill="#ff5a8a"/><path d="M40 46l-10-8v16zM72 46l10-8v16z" fill="#ff9ab8"/></g>'
+            '<g transform="rotate(20 106 42)"><rect x="92" y="34" width="28" height="14" rx="7" fill="#5ad0ff"/><path d="M92 41l-9-7v14zM120 41l9-7v14z" fill="#a8e6ff"/></g>')
+    elif kind=='scare':
+        b+=('<path d="M80 22c-30 0-48 22-48 52 0 36 22 64 48 64s48-28 48-64c0-30-18-52-48-52z" fill="#f2f5fa" stroke="#9aa6c0" stroke-width="3"/>'
+            '<path d="M52 66q10-14 24-4-6 18-24 4zM108 66q-10-14-24-4 6 18 24 4z" fill="#14081f"/><ellipse cx="80" cy="108" rx="13" ry="20" fill="#14081f"/>'
+            '<path d="M24 40l-12-8M136 40l12-8M20 80H6M140 80h14" stroke="#ff8a1f" stroke-width="5" stroke-linecap="round" filter="url(#glow)"/>')
+    elif kind=='ghost':
+        b+=('<path d="M38 140V72c0-28 18-46 42-46s42 18 42 46v68l-12-10-10 10-10-10-10 10-10-10-10 10-10-10z" fill="#eafcff" stroke="#9fd8ff" stroke-width="3" filter="url(#glow)"/>'
+            '<ellipse cx="66" cy="74" rx="7" ry="9" fill="#1a0b2e"/><ellipse cx="94" cy="74" rx="7" ry="9" fill="#1a0b2e"/><ellipse cx="80" cy="98" rx="8" ry="11" fill="#1a0b2e"/>'
+            '<path d="M126 40l4 8 8 2-8 3-4 8-3-8-8-3 8-2z" fill="#ffd36b"/><path d="M30 104l3 6 6 2-6 2-3 6-2-6-6-2 6-2z" fill="#b06cff"/>')
+    elif kind=='empty':
+        b+=('<path d="M30 76L80 34l50 42" fill="#241335" stroke="#6a4a8a" stroke-width="4" stroke-linejoin="round"/><rect x="40" y="74" width="80" height="62" fill="#1c0f2a" stroke="#6a4a8a" stroke-width="4"/>'
+            '<rect x="70" y="98" width="20" height="38" fill="#0b0412"/><rect x="50" y="86" width="14" height="14" fill="#0b0412"/><rect x="96" y="86" width="14" height="14" fill="#0b0412"/>'
+            '<path d="M112 28c8 0 12 4 12 10s-6 8-6 14M118 60v2" stroke="#9aa6c0" stroke-width="4" fill="none" stroke-linecap="round"/>')
+    elif kind=='gift':
+        b+=('<rect x="34" y="66" width="92" height="70" rx="6" fill="#ff5a6e" stroke="#8a1a2a" stroke-width="3"/><rect x="28" y="52" width="104" height="22" rx="5" fill="#ff7a8a" stroke="#8a1a2a" stroke-width="3"/>'
+            '<rect x="72" y="52" width="16" height="84" fill="#ffd36b"/><path d="M80 52c-10-4-30-14-26-24s20 0 26 22c6-22 22-32 26-22s-16 20-26 24z" fill="#ffd36b" stroke="#a8740c" stroke-width="2.5"/>')
+    elif kind=='coins':
+        b+=''.join(f'<ellipse cx="{x}" cy="{y}" rx="30" ry="10" fill="url(#gold)" stroke="#8a5a00" stroke-width="2"/><rect x="{x-30}" y="{y-8}" width="60" height="8" fill="#c9961a"/><ellipse cx="{x}" cy="{y-8}" rx="30" ry="10" fill="url(#gold)" stroke="#8a5a00" stroke-width="2"/>' for x,y in ((60,128),(60,112),(60,96),(104,128),(104,112)))
+        b+='<circle cx="104" cy="64" r="26" fill="url(#gold)" stroke="#8a5a00" stroke-width="3"/><text x="104" y="73" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#8a5a00">$</text>'
+    elif kind=='star':
+        b+=''.join(f'<path d="M80 80L{80+math.cos(a)*62:.0f} {80+math.sin(a)*62:.0f}" stroke="{c}" stroke-width="4" stroke-linecap="round" filter="url(#glow)"/>' for a,c in zip([i*math.pi/6 for i in range(12)],['#ff6b6b','#ffd36b','#5b8cff','#ffffff']*3))
+        b+='<path d="M80 50l9 20 22 2-17 14 5 22-19-12-19 12 5-22-17-14 22-2z" fill="url(#gold)" stroke="#8a5a00" stroke-width="2.5"/>'
+    return svg(b,d,'0 0 160 160','xMidYMid meet')
+def wallpaper():
+    d=lg('s',[(0,'#0a0f1f'),(1,'#141a33')])+rg('a',[(0,'rgba(123,92,255,.6)'),(1,'rgba(123,92,255,0)')])+rg('b',[(0,'rgba(255,95,162,.45)'),(1,'rgba(255,95,162,0)')])+rg('c',[(0,'rgba(95,243,255,.35)'),(1,'rgba(95,243,255,0)')])+SOFT
+    b='<rect width="1200" height="800" fill="url(#s)"/><circle cx="220" cy="140" r="420" fill="url(#a)"/><circle cx="1040" cy="200" r="380" fill="url(#b)"/><circle cx="700" cy="760" r="460" fill="url(#c)"/>'
+    b+=''.join(f'<path d="M-50 {y}C250 {y-140} 500 {y+120} 800 {y-30}S1150 {y-90} 1260 {y}" fill="none" stroke="#ffffff" stroke-opacity="{.035+.01*(i%3):.3f}" stroke-width="{1.5+i%3}"/>' for i,y in enumerate(range(260,800,34)))
+    return svg(b,d,'0 0 1200 800')
+out('christmas','scene',christmas()); out('default','hero',hero_default()); out('halloween','map',citymap()); out('admin','wallpaper',wallpaper())
+os.makedirs(f'{R}/rewards',exist_ok=True)
+for k in ('candy','scare','ghost','empty','gift','coins','star'): out('rewards',k,reward(k))
+open(f'{R}/brand.svg','w').write(brand())

@@ -66,31 +66,83 @@ function ambient(sc, host) {
     `<i class="amb ${a.cls}${a.up ? ' up' : ''}" style="left:${rnd(0, 96).toFixed(0)}%;${a.still ? `top:${rnd(3, 42).toFixed(0)}%;` : ''}--s:${rnd(.6, 1.5).toFixed(2)};--c:${pick(a.colors)};animation-duration:${rnd(7, 16).toFixed(1)}s;animation-delay:-${rnd(0, 14).toFixed(1)}s">${a.html || ''}</i>`).join(''));
 }
 
+/* ---------- Halloween: the street is dark. Sweep the flashlight (your cursor) over a ghost and hold it there to trap it. ---------- */
+const mouse = { x: -1e4, y: -1e4 };
+const BEAM_R = 72, CHARGE_MS = 1300, TICK = 60;
+function aimBeam() {
+  const scene = $('.scene.lights-out'); if (!scene) return;
+  const r = scene.getBoundingClientRect();
+  scene.style.setProperty('--mx', `${mouse.x - r.left}px`); scene.style.setProperty('--my', `${mouse.y - r.top}px`);
+}
+window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; aimBeam(); });
+
+function launchGhost(scene) {
+  scene.insertAdjacentHTML('beforeend', `<span class="ghost" style="--y:${rnd(8, 40).toFixed(0)}%;--c:0">${GHOST}<i class="ring"></i></span>`);
+  const g = scene.lastElementChild; g.charge = 0;
+  timers.push(setTimeout(() => g.remove(), 9200));
+  return g;
+}
+
+function flashlight(scene) { // charges any ghost under the beam; a full charge traps it
+  (function tick() {
+    scene.querySelectorAll('.ghost:not(.pop)').forEach((g) => {
+      const r = g.getBoundingClientRect(), on = Math.hypot(r.left + r.width / 2 - mouse.x, r.top + r.height / 2 - mouse.y) < BEAM_R + r.width / 3;
+      g.charge = on ? Math.min(1, g.charge + TICK / CHARGE_MS) : Math.max(0, g.charge - TICK / (CHARGE_MS * 2));
+      g.style.setProperty('--c', g.charge.toFixed(2)); g.classList.toggle('lit', on);
+      if (g.charge >= 1 && !busy) act(g, 9);
+    });
+    timers.push(setTimeout(tick, TICK));
+  })();
+}
+
 function haunt(ev, scene) { // random ghosts and lightning while the street is open
-  if (ev.ghost) later(function spawn() {
-    scene.insertAdjacentHTML('beforeend', `<button class="ghost" style="--y:${rnd(8, 40).toFixed(0)}%" title="Catch it!">${GHOST}</button>`);
-    const g = scene.lastElementChild; setTimeout(() => g.remove(), 9200); later(spawn, 9000, 17000);
-  }, 3000, 8000);
+  if (ev.ghost) later(function spawn() { launchGhost(scene); later(spawn, 9000, 17000); }, 2500, 6000);
   later(function bolt() { scene.classList.add('flash'); setTimeout(() => scene.classList.remove('flash'), 400); later(bolt, 7000, 15000); }, 4500, 9000);
+  flashlight(scene); aimBeam();
+}
+
+const SPOT_ICON = { halloween: 'house', valentines: 'gift', easter: 'gift', stpatricks: 'star', independence: 'spark', new_years: 'star' };
+function spotStats(ev, left) {
+  const c = ev.contest;
+  if (c) return setStats([
+    { icon: 'trophy', label: 'Your score', value: ptsText(c.points), hot: true },
+    { icon: 'rank', label: 'Leaderboard', value: c.rank ? `#${c.rank}` : 'Unranked' },
+    ev.doors ? { icon: 'door', label: 'City doors tonight', value: ev.doors.today, sub: `/ ${ev.doors.cap}` } : { icon: 'house', label: 'Houses left', value: left, sub: `/ ${ev.picks}` },
+    ev.world ? { icon: 'ghost', label: 'Ghosts today', value: ev.world.today, sub: `/ ${ev.world.cap}` } : null,
+  ].filter(Boolean));
+  setStats([{ icon: SPOT_ICON[ev.id] || 'star', label: 'Left today', value: left, sub: `/ ${ev.picks}` }, { icon: 'check', label: 'Opened today', value: ev.used }]);
+}
+
+function cityCards(ev) { // one sidebar card for the city-wide parts of Halloween: door knocking and ghost hunting
+  const d = ev.doors, w = ev.world; if (!d && !w) return;
+  const meter = (ic, label, n, cap) => `<div class="meter">${icon(ic)}<div><p><span>${label}</span><b>${n}/${cap}</b></p><div class="bar"><i style="width:${cap ? Math.min(100, n / cap * 100) : 0}%"></i></div></div></div>`;
+  setExtra(`<section class="card city"><h2>Around the city${d ? `<span class="badge">${d.total} houses</span>` : ''}</h2>
+    ${d ? `<div class="map"><img src="img/halloween/map.svg" alt=""><span>${icon('pin')} Pumpkin markers on your map</span></div>` : ''}
+    ${d ? meter('door', 'Doors tonight', d.today, d.cap) : ''}${w ? meter(w.flashlight === false ? 'ghost' : 'flashlight', w.flashlight === false ? 'Ghosts caught today' : 'Ghosts trapped with a flashlight', w.today, w.cap) : ''}
+</section>`);
 }
 
 function renderSpots(ev) {
   syncSkinBtn(null); stopAmbient();
   if (ev.contest) { renderBoard(ev.contest); if (!ev.contest.open) return renderResults(ev); }
   const sc = SCENES[ev.id] || SCENES.halloween, left = ev.picks - ev.used, by = Object.fromEntries(ev.opened.map(o => [o.n, o]));
+  const night = ev.id === 'halloween';
   const spots = Array.from({ length: ev.spots }, (_, i) => {
     const n = i + 1, o = by[n];
     return `<button class="spot ${o ? 'done ' + o.kind : ''}" data-n="${n}" style="--i:${i}" ${o || left <= 0 ? 'disabled' : ''}>${sc.art(o, n)}<small>${esc(o ? o.label : sc.cta)}</small></button>`;
   }).join('');
-  main.innerHTML = `<div class="scene sc-${ev.id}">${sc.bg}<div class="spots">${spots}</div></div>
-    <div class="progress"><p>${sc.line(left, ev)}${contestLine(ev)}</p><div class="bar"><i style="width:${ev.picks ? ev.used / ev.picks * 100 : 0}%"></i></div></div>`;
+  main.innerHTML = `<div class="scene sc-${ev.id}${night ? ' lights-out' : ''}">${sc.bg}<div class="spots">${spots}</div>${night ? '<i class="dark"></i><i class="beam"></i>' : ''}</div>
+    <div class="progress"><div class="row"><p>${sc.line(left, ev)}${contestLine(ev)}</p>${night && ev.ghost ? `<span class="tip">${icon('flashlight')}Hold your flashlight on a ghost to trap it</span>` : ''}</div>
+    <div class="bar"><i style="width:${ev.picks ? ev.used / ev.picks * 100 : 0}%"></i></div></div>`;
   const scene = $('.scene'); ambient(sc, scene);
-  if (ev.id === 'halloween') haunt(ev, scene);
+  spotStats(ev, left);
+  if (night) { haunt(ev, scene); cityCards(ev); }
 }
 
 /* ---------- Halloween contest: leaderboard in the sidebar, podium once the board closes ---------- */
 const ordinal = (n) => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
 const ptsText = (n) => `${Number(n || 0).toLocaleString()} pts`;
+const initials = (name) => String(name || '?').split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
 function endsIn(s) {
   if (s >= 2 * 86400) return `Ends in ${Math.floor(s / 86400)} days`;
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
@@ -98,27 +150,26 @@ function endsIn(s) {
 }
 
 function contestLine(ev) {
-  const c = ev.contest; if (!c) return '';
-  const score = c.points > 0 ? ` Your score: ${ptsText(c.points)}, rank #${c.rank}.` : ' You are not on the board yet.';
-  const w = ev.world ? ` Ghosts caught today: ${ev.world.today}/${ev.world.cap}.` : '';
-  return `${score}${w}${c.hint ? `<br><small class="hint">${esc(c.hint)}</small>` : ''}`;
+  const c = ev.contest;
+  return c && c.hint ? `<br><small class="hint">${esc(c.hint)}</small>` : '';
 }
 
 function renderBoard(c) {
   $('.side h2').textContent = 'Leaderboard';
   const ul = $('#upcoming'); ul.className = 'board';
-  const row = (r) => `<li class="r${r.rank}${r.you ? ' you' : ''}"><em>${r.rank}</em><b>${esc(r.name)}</b><span>${ptsText(r.points)}</span></li>`;
+  const row = (r, extra = '') => `<li class="r${r.rank}${r.you ? ' you' : ''}${extra}"><em>${r.rank}</em><i class="av">${esc(initials(r.name))}</i><b>${esc(r.name)}</b><span>${ptsText(r.points)}</span></li>`;
   const top = (c.board || []).slice(0, 5), mine = top.some(r => r.you);
-  ul.innerHTML = top.length ? top.map(row).join('') + (!mine && c.points > 0 ? row({ rank: c.rank, name: 'You', points: c.points, you: true }).replace('<li class="', '<li class="gap ') : '')
+  ul.innerHTML = top.length ? top.map(r => row(r)).join('') + (!mine && c.points > 0 ? row({ rank: c.rank, name: 'You', points: c.points, you: true }, ' gap') : '')
     : '<li class="none"><span>No scores yet. Be the first on the board.</span></li>';
   $('#countdown').textContent = c.open ? endsIn(c.secondsLeft) : 'Contest closed';
 }
 
 function renderResults(ev) {
   const c = ev.contest, w = c.winners || [], prize = c.prize;
+  setStats([{ icon: 'trophy', label: 'Final score', value: ptsText(c.points), hot: true }, { icon: 'rank', label: 'Final rank', value: c.rank ? `#${c.rank}` : 'Unranked' }]);
   const pod = [2, 1, 3].map(p => {
     const x = w.find(r => r.place === p);
-    return `<div class="pod p${p}${x && x.you ? ' you' : ''}" style="--i:${p}"><span class="nm">${x ? esc(x.name) : 'Nobody'}</span><small>${x ? ptsText(x.points) : ''}</small><div class="step"><b>${ordinal(p)}</b></div></div>`;
+    return `<div class="pod p${p}${x && x.you ? ' you' : ''}" style="--i:${p}"><i class="av">${x ? esc(initials(x.name)) : '?'}</i><span class="nm">${x ? esc(x.name) : 'Nobody'}</span><small>${x ? ptsText(x.points) : ''}</small><div class="step"><b>${ordinal(p)}</b></div></div>`;
   }).join('');
   const line = prize ? (prize.claimed ? `You placed ${ordinal(prize.place)}. Your prize has been claimed. Well played.` : `You placed ${ordinal(prize.place)}. Claim your prize before the season ends.`)
     : c.points > 0 ? `The contest is over. You finished #${c.rank} with ${ptsText(c.points)}.` : 'The contest is over. Thanks to everyone who played.';
@@ -139,6 +190,7 @@ const DISH = {
 function renderFeast(ev) {
   syncSkinBtn(null); stopAmbient();
   const n = ev.dishes.length, done = ev.dishes.filter(d => d.status === 'served').length;
+  setStats([{ icon: 'plate', label: 'Dishes served', value: done, sub: `/ ${n}`, hot: true }, { icon: 'clock', label: 'Played today', value: ev.minutes, sub: 'min' }]);
   const plates = ev.dishes.map((d, i) => `<div class="dish s-${d.status}"><button class="plate ${d.status === 'ready' ? 'ready' : ''}" data-i="${i + 1}" ${d.status === 'ready' ? '' : 'disabled'}><svg viewBox="0 0 64 64">${DISH[d.id] || DISH.pie}</svg>${d.status === 'ready' ? '<em>Serve</em>' : ''}</button>
     <small><b>${esc(d.label)}</b>${d.status === 'served' ? 'On the table' : d.status === 'ready' ? 'Ready to serve' : `Unlocks at ${d.need} min`}</small></div>`).join('');
   const line = ev.final === 'done' ? 'The table is set and everyone has eaten. Happy Thanksgiving.'
@@ -155,40 +207,44 @@ Object.assign(EXPERIENCES, { spots: renderSpots, feast: renderFeast, countdown: 
 const FXK = { trick: 'scare', empty: 'none', dud: 'none' };
 function fx(res, x, y) {
   const k = FXK[res.kind] || 'win', scene = $('.scene'), rig = $('.rig'), id = state.event.id;
-  const pts = state.event.contest && res.points ? ` +${res.points} pts` : '';
+  const pts = state.event.contest && res.points ? res.points : 0;
   if (k === 'scare') {
     rig.classList.add('scare'); rig.insertAdjacentHTML('beforeend', '<div class="boo">BOO!</div>');
     setTimeout(() => { rig.classList.remove('scare'); rig.querySelector('.boo')?.remove(); }, 950);
-    return say((res.msg || 'Something jumped out.') + pts);
+    return say((res.msg || 'Something jumped out.') + (pts ? ` +${pts} pts` : ''));
   }
-  if (k === 'none') return say((res.msg || res.label) + pts);
+  if (k === 'none') return say((res.msg || res.label) + (pts ? ` +${pts} pts` : ''));
   const b = getComputedStyle(document.documentElement).getPropertyValue('--b').trim(), fw = ['#ff6b6b', '#5b8cff', '#ffffff', '#ffd36b'];
   const n = id === 'independence' ? 28 : 14;
   scene.insertAdjacentHTML('beforeend', Array.from({ length: n }, (_, i) => `<i class="fw" style="left:${x}px;top:${y}px;--c:${id === 'independence' ? fw[i % 4] : b};--r:${i * 360 / n}deg;--d:${-(60 + (i % 3) * (id === 'independence' ? 45 : 30))}px"></i>`).join(''));
   if (res.kind === 'ghost') scene.insertAdjacentHTML('beforeend', `<span class="ghost pop" style="left:${x}px;top:${y}px">${GHOST}</span>`);
-  reveal({ head: res.kind === 'ghost' ? 'A ghost slips you something' : 'You found something', label: res.label, sub: (res.msg || '') + pts });
+  reveal({ head: res.kind === 'ghost' ? 'Ghost trapped' : 'You found something', label: res.label, sub: res.msg, kind: res.kind, points: pts });
 }
 
-main.addEventListener('click', async (e) => {
+/* One play: el is the thing that was used (spot, plate, candle, prize button or a trapped ghost) */
+async function act(el, arg) {
   const ev = state && state.event; if (!ev || busy) return;
-  const g = e.target.closest('.ghost:not(.pop)'), s = e.target.closest('.spot:not([disabled])'), p = e.target.closest('.plate.ready, .grace.ready'), c = e.target.closest('.candle-btn:not([disabled])');
-  const el = g || s || p || c; if (!el) return;
   const sr = $('.scene').getBoundingClientRect(), r = el.getBoundingClientRect();
   const x = r.left + r.width / 2 - sr.left, y = r.top + r.height / 2 - sr.top;
-  const arg = g ? 9 : s ? +s.dataset.n : c ? 1 : p.dataset.arg ? +p.dataset.arg : p.dataset.i ? +p.dataset.i : 7;
-  busy = true; say(''); if (g) g.remove();
+  busy = true; say(''); if (arg === 9) el.remove();
   const res = await post('play', { event: ev.id, arg }); busy = false;
   if (!res.ok) return say(res.msg, true);
   if (ev.kind === 'feast') {
     if (arg === 7) ev.final = 'done';
     else { ev.dishes[arg - 1].status = 'served'; if (ev.dishes.every(d => d.status === 'served') && ev.final === 'locked') ev.final = 'ready'; }
-    renderFeast(ev); return reveal({ head: arg === 7 ? 'Grace' : 'Served', label: res.label, sub: res.msg });
+    renderFeast(ev); return reveal({ head: arg === 7 ? 'Grace' : 'Served', label: res.label, sub: res.msg, kind: 'dish' });
   }
-  if (ev.kind === 'tribute') { ev.lit = true; ev.total++; renderTribute(ev); return reveal({ head: 'Remembered', label: res.label, sub: res.msg }); }
-  if (arg === 8) { ev.contest.prize.claimed = true; renderSpots(ev); return reveal({ head: 'Prize claimed', label: res.label, sub: res.msg }); }
+  if (ev.kind === 'tribute') { ev.lit = true; ev.total++; renderTribute(ev); return reveal({ head: 'Remembered', label: res.label, sub: res.msg, kind: 'candle' }); }
+  if (arg === 8) { ev.contest.prize.claimed = true; renderSpots(ev); return reveal({ head: 'Prize claimed', label: res.label, sub: res.msg, kind: 'prize' }); }
   if (res.contest && ev.contest) Object.assign(ev.contest, res.contest);
-  if (g) ev.ghost = false; else { ev.used++; ev.opened.push({ n: arg, kind: res.kind, label: res.label }); }
+  if (arg === 9) ev.ghost = false; else { ev.used++; ev.opened.push({ n: arg, kind: res.kind, label: res.label }); }
   renderSpots(ev); fx(res, x, y);
+}
+
+main.addEventListener('click', (e) => {
+  const s = e.target.closest('.spot:not([disabled])'), p = e.target.closest('.plate.ready, .grace.ready'), c = e.target.closest('.candle-btn:not([disabled])');
+  const el = s || p || c; if (!el) return;
+  act(el, s ? +s.dataset.n : c ? 1 : p.dataset.arg ? +p.dataset.arg : p.dataset.i ? +p.dataset.i : 7);
 });
 
 /* ---------- New Year's Eve: ball-drop countdown (display only; the ball falls through the last hour) ---------- */
@@ -201,6 +257,7 @@ function burst(scene, x, y, cols, n = 24, dist = 90) {
 
 function renderCountdown(ev) {
   syncSkinBtn(null); stopAmbient();
+  setStats([{ icon: 'clock', label: 'Countdown', value: ev.secondsLeft > 0 ? 'Tonight' : 'Midnight', hot: true }, { icon: 'users', label: 'Celebrate with', value: 'The city' }]);
   main.innerHTML = `<div class="scene sc-${ev.id}"><i class="ball"></i><div class="clock"><small></small><b></b></div></div><div class="progress"><p></p><div class="bar"><i></i></div></div>`;
   const scene = $('.scene'), ball = $('.ball'), digits = $('.clock b'), label = $('.clock small'), line = $('.progress p'), bar = $('.bar i');
   ambient({ amb: { cls: 'confetti', n: 28, colors: ['#f5c542', '#ffd86b', '#e8ecff', '#ff9ac1', '#8fd8ff'] } }, scene);
@@ -226,6 +283,7 @@ const CANDLE = (lit) => `<svg viewBox="0 0 40 96"><defs><radialGradient id="cg">
 
 function renderTribute(ev) {
   syncSkinBtn(null); stopAmbient();
+  setStats([{ icon: 'flame', label: 'Candles lit', value: ev.total.toLocaleString(), hot: true }, { icon: 'check', label: 'Your candle', value: ev.lit ? 'Lit' : 'Not yet' }]);
   const others = Math.min(Math.max(ev.total - (ev.lit ? 1 : 0), 0), 10), side = (n) => Array.from({ length: n }, () => CANDLE(true)).join('');
   main.innerHTML = `<div class="scene sc-${ev.id}"><div class="vigil l">${side(Math.ceil(others / 2))}</div>
     <button class="candle-btn ${ev.lit ? 'lit' : ''}" ${ev.lit ? 'disabled' : ''}>${CANDLE(ev.lit)}<small>${ev.lit ? 'Your candle is lit' : 'Light a candle'}</small></button>

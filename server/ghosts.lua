@@ -47,7 +47,7 @@ function Ghosts.spawnFor(src, force)
 
     nextId = nextId + 1
     local id = nextId
-    Ghosts.active[id] = { src = src, coords = c, expires = os.time() + G.lifetime }
+    Ghosts.active[id] = { src = src, coords = c, born = os.time(), expires = os.time() + G.lifetime }
     Ghosts.count = Ghosts.count + 1
     Ghosts.byPlayer[src] = id
     Ghosts.last[src] = os.time()
@@ -112,6 +112,11 @@ lib.callback.register('s2-holidays:ghost:catch', function(src, id)
     local ped = GetPlayerPed(src)
     if not ped or ped == 0 or #(GetEntityCoords(ped) - g.coords) > G.catchRadius then
         return { ok = false, msg = 'Get closer to the ghost.' }
+    end
+    local FL = G.flashlight
+    if FL and FL.required then -- the beam has to be on it for `exposure` seconds, with the flashlight actually in hand
+        if GetSelectedPedWeapon(ped) ~= joaat(FL.weapon) then return { ok = false, msg = 'You need a flashlight in your hands.' } end
+        if os.time() - g.born < math.floor(FL.exposure) then return { ok = false, msg = 'Keep the light on it a little longer.' } end
     end
     Ghosts.remove(id) -- removed before any await, so a second request can never pay out twice
     local res = Events.worldCatch(src)

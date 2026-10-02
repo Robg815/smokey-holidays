@@ -23,12 +23,15 @@ def main():
             pg.goto(URL + query); pg.add_style_tag(content=BG); pg.wait_for_timeout(wait)
             if act: act()
             pg.screenshot(path=str(OUT / f'{name}.png')); print('wrote', OUT / f'{name}.png')
-        for i in (want or IDS): shot(f'?holiday={i}&art', i)
+        beam = lambda: (pg.mouse.move(1180, 560), pg.wait_for_timeout(150))  # sweep the flashlight into the sky for the Halloween shot
+        for i in (want or IDS): shot(f'?holiday={i}&art', i, act=beam if i == 'halloween' else None)
         if not want:
             shot('?holiday=halloween&force=trick', 'halloween_scare', 1900, lambda: (pg.click('.spot:not([disabled])'), pg.wait_for_timeout(260)))
             shot('?holiday=christmas&skin=holo&art', 'holo')
             shot('?holiday=halloween&closed', 'halloween_closed')
-            shot('?admin', 'admin', 500, lambda: (pg.click('input[data-id=easter][data-a=force]'), pg.wait_for_timeout(200)))
+            shot('?admin', 'admin', 600)
+            shot('?admin', 'admin_holidays', 600, lambda: (pg.click('button[data-tab=holidays]'), pg.click('input[data-id=easter][data-a=force]'), pg.wait_for_timeout(200)))
+            shot('?admin', 'admin_halloween', 600, lambda: (pg.click('button[data-tab=halloween]'), pg.wait_for_timeout(200)))
         b.close()
     if not want:
         from PIL import Image

@@ -1,4 +1,5 @@
 -- Date rule checks. Run from the resource root: lua5.4 dev/dates_test.lua
+vec3 = vec3 or function(x, y, z) return { x = x, y = y, z = z } end -- FiveM builtin, stubbed for plain Lua
 dofile('config.lua'); dofile('server/dates.lua')
 local function chk(name, c) print((c and 'PASS ' or 'FAIL ') .. name); if not c then FAILED = true end end
 chk('epoch', Dates.toDays(1970,1,1) == 0)

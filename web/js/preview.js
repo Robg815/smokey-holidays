@@ -5,7 +5,7 @@
 const PV = new URLSearchParams(location.search);
 
 const ADM = {
-  year: 2026, date: '2026-09-30', real: '2026-09-30', override: false, clock: null, advent: true, msg: '', ghosts: 2, ghostMax: 10,
+  year: 2026, date: '2026-09-30', real: '2026-09-30', override: false, clock: null, advent: true, msg: '', ghosts: 2, ghostMax: 10, doors: 21, flashlight: true,
   holidays: [['new_years', "New Year's Day", 'spots'], ['mlk', 'Martin Luther King Jr. Day', 'observance'], ['valentines', "Valentine's Day", 'spots'], ['presidents', "Presidents' Day", 'observance'],
     ['stpatricks', "St. Patrick's Day", 'spots'], ['easter', 'Easter', 'spots'], ['mothers_day', "Mother's Day", 'observance'], ['memorial', 'Memorial Day', 'tribute'], ['juneteenth', 'Juneteenth', 'observance'],
     ['fathers_day', "Father's Day", 'observance'], ['independence', 'Independence Day', 'spots'], ['labor', 'Labor Day', 'observance'], ['columbus', "Columbus / Indigenous Peoples' Day", 'observance'],
@@ -67,11 +67,11 @@ if (!inGame) {
     .sort((a, b) => b[1] - a[1]).map(([name, points], i) => ({ rank: i + 1, name, points, you: name === 'Jordan K.' }));
   const PVE = {
     halloween: PV.has('closed')
-      ? { kind: 'spots', spots: 5, picks: 5, used: 5, opened: [], ghost: false, world: { today: 0, cap: 8 },
+      ? { kind: 'spots', spots: 5, picks: 5, used: 5, opened: [], ghost: false, world: { today: 0, cap: 8, flashlight: true },
           contest: { open: false, secondsLeft: 0, points: 265, rank: 1, hint: 'Treats +10, ghost loot +25, catch ghosts around the city +30.', board: BOARD(265),
             winners: [{ place: 1, name: 'Jordan K.', points: 265, you: true }, { place: 2, name: 'Marcus T.', points: 240, you: false }, { place: 3, name: 'Priya S.', points: 198, you: false }],
             prize: { place: 1, label: 'Halloween Champion', claimed: false } } }
-      : { kind: 'spots', spots: 5, picks: 5, used: 2, opened: [{ n: 2, kind: 'treat', label: 'Candy haul' }, { n: 4, kind: 'empty', label: 'Nobody home' }], ghost: true, world: { today: 2, cap: 8 },
+      : { kind: 'spots', spots: 5, picks: 5, used: 2, opened: [{ n: 2, kind: 'treat', label: 'Candy haul' }, { n: 4, kind: 'empty', label: 'Nobody home' }], ghost: true, world: { today: 2, cap: 8, flashlight: true }, doors: { today: 6, cap: 15, total: 21 },
           contest: { open: true, secondsLeft: 1047600, points: 85, rank: 7, hint: 'Treats +10, ghost loot +25, catch ghosts around the city +30.', board: BOARD(85) } },
     valentines: { kind: 'spots', spots: 6, picks: 1, used: 0, opened: [] },
     easter: { kind: 'spots', spots: 8, picks: 3, used: 1, opened: [{ n: 3, kind: 'golden', label: 'Golden egg' }] },
@@ -85,9 +85,9 @@ if (!inGame) {
       ['corn', 'Sweet corn', 20, 'ready'], ['rolls', 'Dinner rolls', 25, 'waiting'], ['cranberry', 'Cranberry sauce', 30, 'waiting']].map(([i, label, need, status]) => ({ id: i, label, need, status })) },
   };
   const s = {
-    date: '2026-12-12', theme: th,
-    active: [{ id, label: L[id], blurb: B[id], daysUntil: 0, date: '2026-12-12', theme: th }],
-    upcoming: [{ label: "New Year's Eve", daysUntil: 19, date: '2026-12-31' }, { label: "New Year's Day", daysUntil: 20, date: '2027-01-01' }, { label: 'Martin Luther King Jr. Day', daysUntil: 41, date: '2027-01-18' }],
+    date: '2026-10-19', theme: th,
+    active: [{ id, label: L[id], blurb: B[id], daysUntil: 0, date: '2026-10-19', theme: th }],
+    upcoming: [{ label: 'Veterans Day', daysUntil: 23, date: '2026-11-11' }, { label: 'Thanksgiving', daysUntil: 38, date: '2026-11-26' }, { label: 'Christmas', daysUntil: 67, date: '2026-12-25' }, { label: "New Year's Eve", daysUntil: 73, date: '2026-12-31' }],
   };
   if (id === 'christmas') {
     s.advent = { skin: PV.get('skin') || 'wood', current: 12, days: 24, minutes: 12, doors: Array.from({ length: 24 }, (_, i) => {

@@ -1,6 +1,6 @@
 /* Advent calendar: shared drawer anatomy, then two skins (wood = reference photo, holo = frosted glass) */
-.drows { display: grid; gap: 9px; }
-.drow { display: flex; gap: 9px; height: clamp(62px, 9.4vh, 92px); }
+.drows { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 9px; }
+.drow { display: flex; gap: 9px; min-height: 0; }
 .boot .drow { animation: seat .55s var(--ease) both; }
 .boot .drow:nth-child(1) { animation-delay: .45s; } .boot .drow:nth-child(2) { animation-delay: .53s; } .boot .drow:nth-child(3) { animation-delay: .61s; }
 .boot .drow:nth-child(4) { animation-delay: .69s; } .boot .drow:nth-child(5) { animation-delay: .77s; }
@@ -115,3 +115,4 @@
 .skin-holo .door.narrow.claimed .s { display: block; font-size: 9px; }
 
 @media (prefers-reduced-motion: reduce) { .boot .drow, .door.ready, .door.pulled { animation: none; } .door { transition: none; } }
+.drows.skin-wood { margin: 12px 12px 0; } /* room for the frame shadow inside the new window */

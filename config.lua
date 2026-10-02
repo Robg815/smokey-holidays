@@ -217,4 +217,54 @@ Config.Ghosts = {
     nightOnly = true,          -- only between 20:00 and 06:00 on the in-game clock (checked on the client)
     skipVehicleSpeed = 8.0,    -- m/s; fast drivers are left alone
     model = 'u_m_y_zombie_01', alpha = 100, light = { 120, 200, 255 },
+    -- Ghosts can only be caught with a flashlight: aim it at the ghost and hold the beam on it until it is trapped.
+    flashlight = {
+        required = true,               -- false = the old way (walk up and press E)
+        weapon = 'WEAPON_FLASHLIGHT',  -- must be the weapon in hand (ox_inventory item WEAPON_FLASHLIGHT); the server checks it too
+        range = 22.0,                  -- metres the beam reaches
+        cone = 9.0,                    -- degrees either side of where you are aiming that still count as on target
+        exposure = 3.5,                -- seconds the beam has to stay on the ghost
+        decay = 0.6,                   -- exposure lost per second while the beam is off it
+    },
+}
+
+-- ==========================================================================
+-- City-wide trick or treating (Halloween). Walk up to any listed front door and knock.
+-- Every door can be knocked once per night per player, up to `perNight` doors. Outcomes and points use
+-- Config.Events.halloween.outcomes unless you give this its own `outcomes` list.
+-- Door positions are where the player stands outside the door. Check them on your map; add your own with
+-- /holidaydoor (prints a ready-to-paste line for where you are standing to F8 and copies it).
+-- ==========================================================================
+Config.TrickOrTreat = {
+    enabled = true,
+    perNight = 15,              -- doors per player per day
+    distance = 2.0,             -- how close you need to be to knock (client prompt)
+    verifyDistance = 6.0,       -- server-side tolerance for the same check
+    knockTime = 2500,           -- ms the knock takes (cancelable)
+    nightOnly = false,          -- true = only 18:00 to 06:00 on the in-game clock
+    blips = { enabled = true, sprite = 40, colour = 47, scale = 0.65, label = 'Trick or treat' },
+    outcomes = nil,
+    doors = {
+        { coords = vec3(-14.11, -1441.93, 31.10), area = 'Forum Drive' },
+        { coords = vec3(126.81, -1929.98, 21.38), area = 'Grove Street' },
+        { coords = vec3(118.42, -1920.95, 21.32), area = 'Grove Street' },
+        { coords = vec3(100.91, -1912.19, 21.40), area = 'Grove Street' },
+        { coords = vec3(72.21, -1938.63, 21.37),  area = 'Grove Street' },
+        { coords = vec3(76.35, -1948.12, 21.17),  area = 'Grove Street' },
+        { coords = vec3(85.78, -1959.66, 21.12),  area = 'Grove Street' },
+        { coords = vec3(114.33, -1961.12, 21.33), area = 'Grove Street' },
+        { coords = vec3(1273.90, -1720.70, 54.77), area = 'El Burro Heights' },
+        { coords = vec3(1060.48, -378.29, 68.23), area = 'Mirror Park' },
+        { coords = vec3(1010.47, -423.43, 65.35), area = 'Mirror Park' },
+        { coords = vec3(987.75, -433.03, 64.04),  area = 'Mirror Park' },
+        { coords = vec3(970.79, -701.33, 58.48),  area = 'Mirror Park' },
+        { coords = vec3(979.27, -716.32, 58.22),  area = 'Mirror Park' },
+        { coords = vec3(996.89, -729.56, 57.82),  area = 'Mirror Park' },
+        { coords = vec3(1229.63, -725.41, 60.95), area = 'Mirror Park' },
+        { coords = vec3(-816.70, 178.07, 72.22),  area = 'Rockford Hills' },
+        { coords = vec3(-1896.30, 642.50, 130.20), area = 'Richman Glen' },
+        { coords = vec3(-174.35, 502.60, 137.42), area = 'Vinewood Hills' },
+        { coords = vec3(-853.00, 695.50, 148.80), area = 'Vinewood Hills' },
+        { coords = vec3(1973.60, 3815.30, 33.43), area = 'Sandy Shores' },
+    },
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Holidays</title>
+<title>S2 Holidays</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/advent.css">
 <link rel="stylesheet" href="css/events.css">
@@ -12,24 +12,34 @@
 <body>
 <div id="app" class="hidden" role="dialog" aria-modal="true" aria-labelledby="title">
   <div class="rig">
-    <header class="top">
-      <div class="ttl">
-        <img id="emblem" alt="" hidden>
-        <div><h1 id="title"></h1><p id="blurb"></p></div>
-      </div>
-      <div class="when"><span id="countdown"></span><span id="today"></span></div>
+    <nav class="titlebar">
+      <div class="brand"><img src="img/brand.svg" alt=""><span>S2 <b>Holidays</b></span></div>
+      <div class="tb-mid"><i class="live"></i><span id="today"></span></div>
       <div class="acts">
         <button id="skin" type="button" hidden>Holo skin</button>
-        <button id="close" type="button">Close <kbd>Esc</kbd></button>
+        <button id="close" type="button" aria-label="Close"><span>Close</span><kbd>Esc</kbd></button>
       </div>
+    </nav>
+    <header class="top">
+      <div class="hero" id="hero"></div>
+      <div class="ttl">
+        <img id="emblem" alt="" hidden>
+        <div class="tt">
+          <div class="when"><span id="countdown"></span><span id="eyebrow" class="eyebrow"></span></div>
+          <h1 id="title"></h1><p id="blurb"></p>
+        </div>
+      </div>
+      <div id="stats" class="stats"></div>
     </header>
     <div class="stage">
-      <aside class="side"><h2>Coming up</h2><ul id="upcoming"></ul></aside>
+      <aside class="side">
+        <section class="card list-card"><h2>Coming up</h2><ul id="upcoming"></ul></section>
+        <div id="extra"></div>
+      </aside>
       <section id="main"></section>
     </div>
     <p id="msg" class="msg" role="status" aria-live="polite"></p>
   </div>
-  <div class="emitter"></div>
 </div>
 <div id="admin" class="off" role="dialog" aria-modal="true" aria-label="Holiday admin"></div>
 <script src="js/core.js"></script>

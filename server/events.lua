@@ -145,6 +145,15 @@ function Events.contestOpen(id)
 end
 Events.nameOf, Events.addPoints = nameOf, addPoints
 
+-- Shared building blocks for other server files (city doors). Same rules: roll, check space, claim, pay, score.
+Events.util = { cfgFor = cfgFor, cidOf = cidOf, roll = roll, canCarry = canCarry, give = give, rows = rows, insert = insert, award = award, busy = busy, FULL = FULL }
+
+-- City doors knocked today (slot = day * 1000 + door index)
+function Events.doorsToday(cid, y, m, d)
+    local base = Dates.toDays(y, m, d) * 1000
+    return rows(cid, 'halloween_door', y, base, base + 999)
+end
+
 -- A ghost caught out in the world (verified by server/ghosts.lua before this is called)
 function Events.worldCatch(src)
     local cfg, cid = cfgFor('halloween'), cidOf(src)
@@ -209,7 +218,12 @@ function Events.state(src, h, y, m, d)
             end
             if cfg.world then
                 local base = Dates.toDays(y, m, d) * 100
-                out.world = { today = #rows(cid, h.id .. '_ghost', y, base, base + 99), cap = cfg.world.perDay }
+                out.world = { today = #rows(cid, h.id .. '_ghost', y, base, base + 99), cap = cfg.world.perDay,
+                    flashlight = Config.Ghosts and Config.Ghosts.flashlight and Config.Ghosts.flashlight.required == true }
+            end
+            local tt = Config.TrickOrTreat
+            if h.id == 'halloween' and tt and tt.enabled then
+                out.doors = { today = #Events.doorsToday(cid, y, m, d), cap = tt.perNight, total = #tt.doors }
             end
         end
 

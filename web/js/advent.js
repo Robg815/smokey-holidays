@@ -52,6 +52,8 @@ $('#skin').addEventListener('click', () => {
 
 function renderAdvent(a) {
   syncSkinBtn(a);
+  setStats([{ icon: 'gift', label: "Today's door", value: `Door ${a.current}`, hot: true }, { icon: 'clock', label: 'Played today', value: a.minutes, sub: 'min' },
+    { icon: 'check', label: 'Doors opened', value: a.doors.filter(d => d.status === 'claimed').length, sub: `/ ${a.days}` }]);
   const by = Object.fromEntries(a.doors.map(d => [d.day, d]));
   const rows = (a.layout || DEFAULT_LAYOUT).map(r => `<div class="drow">${r.map(([day, w, f]) => door(by[day], w, a, f)).join('')}</div>`).join('');
 
@@ -70,5 +72,5 @@ main.addEventListener('click', async (e) => {
   busy = true; say(''); pending = Number(el.dataset.day);
   const res = await post('claim', { day: pending });
   busy = false; pending = null;
-  if (res.ok) { say(`Door ${res.day} opened: ${res.label}`); reveal({ head: `Door ${res.day} opened`, label: res.label }); } else say(res.msg, true);
+  if (res.ok) { say(`Door ${res.day} opened: ${res.label}`); reveal({ head: `Door ${res.day} opened`, label: res.label, kind: 'door' }); } else say(res.msg, true);
 });
