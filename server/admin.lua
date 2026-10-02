@@ -70,7 +70,7 @@ local function build()
         local ev = Config.Events and Config.Events[h.id]
         list[#list + 1] = {
             id = h.id, label = h.label, natural = natural[h.id] == true,
-            kind = h.id == 'christmas' and 'advent' or (ev and ev.kind) or 'observance',
+            kind = h.id == 'christmas' and 'advent' or (ev and (ev.style and (ev.kind .. ':' .. ev.style) or ev.kind)) or 'observance',
             enabled = not Admin.disabled[h.id], forced = Admin.forced[h.id] == true,
         }
     end

@@ -262,3 +262,131 @@ out('christmas','scene',christmas()); out('default','hero',hero_default()); out(
 os.makedirs(f'{R}/rewards',exist_ok=True)
 for k in ('candy','scare','ghost','empty','gift','coins','star'): out('rewards',k,reward(k))
 open(f'{R}/brand.svg','w').write(brand())
+
+# ---------------- the seven holidays that used to be plain observance days ----------------
+GL='<filter id="gw" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+def dove(x,y,s,flip=False,op=1):
+    return (f'<g transform="translate({x} {y}) scale({-s if flip else s} {s})" opacity="{op}">'
+        '<path d="M-26 6C-12-2 6-2 16 2l12-5-4 9c-6 7-22 11-36 7z" fill="#fff"/>'
+        '<path d="M-6 2C-4-14 6-28 24-34 16-20 12-6 6 4z" fill="#eef1ff"/><path d="M-10 3C-16-10-14-22-6-30-6-16-2-6 2 3z" fill="#dfe4ff"/>'
+        '<circle cx="19" cy="0" r="1.6" fill="#1a1f4a"/></g>')
+def mlk():
+    d=(lg('s',[(0,'#141a44'),(.4,'#4a3a7a'),(.72,'#e07a6a'),(1,'#ffd27a')])+rg('sun',[(0,'#fff6d0'),(.5,'#ffd27a'),(1,'#ffb35a')])
+       +rg('glow',[(0,'rgba(255,214,140,.65)'),(1,'rgba(255,214,140,0)')])
+       +'<pattern id="brick" width="60" height="26" patternUnits="userSpaceOnUse"><rect width="60" height="26" fill="#6a2f2a"/><path d="M0 13H60M0 0H60M30 0V13M0 13V26M60 13V26" stroke="#4a1d1a" stroke-width="2"/></pattern>')
+    b=sky('s')+stars(40,150,8)+'<circle cx="600" cy="360" r="330" fill="url(#glow)"/>'
+    b+=''.join(f'<path d="M600 360L{600+math.cos(a)*900:.0f} {360+math.sin(a)*900:.0f}" stroke="#ffe6a8" stroke-opacity=".08" stroke-width="26"/>' for a in [math.pi+i*math.pi/14 for i in range(1,14)])
+    b+='<circle cx="600" cy="360" r="96" fill="url(#sun)"/>'+skyline(17,380,40,170,'#2a2450',lit='#ffd27a',p=.12)
+    b+=dove(360,150,1.4)+dove(450,110,.9)+dove(820,130,1.2,True)+dove(900,190,.7,True,.85)+dove(260,210,.6,False,.7)
+    b+='<rect y="372" width="1200" height="148" fill="url(#brick)"/><rect y="366" width="1200" height="10" fill="#8a4a3a"/>'
+    b+=''.join(f'<path d="{"M0-14c-5-6-14-2-14 5 0 7 14 14 14 14s14-7 14-14c0-7-9-11-14-5z"}" transform="translate({x} {y}) scale({s})" fill="{c}" opacity=".35"/>' for x,y,s,c in ((140,420,1.4,'#ffd36b'),(1060,430,1.2,'#8fb4ff'),(600,470,1,'#ff9ab8')))
+    return svg(b+'<rect y="500" width="1200" height="20" fill="#2a1210"/>',d)
+def dome(x,y,s):
+    return (f'<g transform="translate({x} {y}) scale({s})" fill="#1a2350">'
+        '<rect x="-230" y="-60" width="460" height="60"/><rect x="-250" y="-70" width="500" height="12"/>'
+        +''.join(f'<rect x="{cx}" y="-58" width="8" height="56" fill="#2a3670"/>' for cx in range(-220,221,22))+
+        '<rect x="-110" y="-120" width="220" height="52"/><path d="M-120-118h240v-10h-240z"/>'
+        '<path d="M-90-128a90 86 0 01180 0z"/><rect x="-14" y="-236" width="28" height="30"/><path d="M-20-206h40l-6-8h-28z"/><path d="M0-236l-6-18h12z"/></g>')
+def presidents():
+    d=lg('s',[(0,'#060c2a'),(.6,'#14245a'),(1,'#2a3f88')])+rg('spot',[(0,'rgba(200,220,255,.35)'),(1,'rgba(200,220,255,0)')])+lg('vel',[(0,'#5a0f1e'),(1,'#2a0610')])
+    b=sky('s')+stars(110,320,13)
+    b+=''.join(f'<path d="M{x} 520L{x+dx} 0" stroke="#cfe0ff" stroke-opacity=".07" stroke-width="60"/>' for x,dx in ((300,-160),(900,160),(600,0)))
+    b+='<ellipse cx="600" cy="300" rx="420" ry="160" fill="url(#spot)"/>'+dome(600,372,1.15)
+    b+=bunting(['#d7263d','#f4f6ff','#3b57c8'],10,30)
+    b+=''.join(star4(x,y,s,'#ffd36b',.9) for x,y,s in ((200,110,1.4),(1000,90,1.6),(120,240,.9),(1080,230,1)))
+    b+='<rect y="372" width="1200" height="148" fill="url(#vel)"/><rect y="370" width="1200" height="6" fill="#e6b84a"/><rect y="384" width="1200" height="1.5" fill="#e6b84a" opacity=".5"/>'
+    return svg(b,d)
+def bloom(x,y,s,c,center='#ffd36b',n=5):
+    return f'<g transform="translate({x:.0f} {y:.0f}) scale({s:.2f})">'+''.join(f'<ellipse cx="0" cy="-7" rx="5" ry="8" fill="{c}" transform="rotate({i*360/n:.0f})"/>' for i in range(n))+f'<circle r="4" fill="{center}"/></g>'
+def mothers():
+    r=random.Random(51); d=lg('s',[(0,'#ffd6e8'),(.6,'#ffe9d6'),(1,'#fff6e6')])+rg('sun',[(0,'#fffbe8'),(1,'rgba(255,240,200,0)')])+lg('g',[(0,'#8fd18a'),(1,'#4a9a52')])
+    b=sky('s')+'<circle cx="980" cy="110" r="190" fill="url(#sun)"/><circle cx="980" cy="110" r="52" fill="#fff6d8"/>'
+    b+=''.join(f'<g fill="#fff" opacity=".9"><ellipse cx="{x}" cy="{y}" rx="70" ry="22"/><ellipse cx="{x+30}" cy="{y-14}" rx="40" ry="22"/><ellipse cx="{x-30}" cy="{y-8}" rx="34" ry="18"/></g>' for x,y in ((220,90),(620,60),(420,150)))
+    b+=hills(330,30,'#b8e0a0',5)+hills(360,20,'#9ad08a',6)
+    b+=''.join(f'<path d="M{x} 330v-60l7-10 7 10v60z" fill="#fff" stroke="#e8d8d0"/>' for x in range(0,1200,26))+'<rect y="292" width="1200" height="8" fill="#fff"/><rect y="318" width="1200" height="8" fill="#fff"/>'
+    b+='<rect y="340" width="1200" height="180" fill="url(#g)"/>'
+    cols=['#ff6fa8','#ff9ac1','#ffd36b','#c79bff','#ff7a6a','#ffffff']
+    b+=''.join(bloom(r.uniform(0,1200),r.uniform(350,510),r.uniform(.6,1.3),r.choice(cols)) for _ in range(140))
+    b+=''.join(f'<g transform="translate({x} {y}) rotate({a})"><ellipse cx="-6" cy="0" rx="7" ry="10" fill="{c}" transform="rotate(-25)"/><ellipse cx="6" cy="0" rx="7" ry="10" fill="{c}" transform="rotate(25)"/><rect x="-1" y="-6" width="2" height="12" fill="#3a2a3a"/></g>' for x,y,a,c in ((330,240,-10,'#ff9ac1'),(760,200,15,'#c79bff'),(1080,260,-5,'#ffd36b')))
+    return svg(b,d)
+def burst2(x,y,rad,c,n=16):
+    return f'<g filter="url(#gw)">'+''.join(f'<path d="M{x} {y}L{x+math.cos(i*2*math.pi/n)*rad:.0f} {y+math.sin(i*2*math.pi/n)*rad:.0f}" stroke="{c}" stroke-width="2.5" stroke-linecap="round" opacity=".85"/>' for i in range(n))+'</g>'
+def juneteenth():
+    r=random.Random(61); d=lg('s',[(0,'#1a0a2a'),(.45,'#7a1e3a'),(.78,'#e8603a'),(1,'#ffc24a')])+GL+lg('g',[(0,'#2e5a2a'),(1,'#1a3a18')])
+    b=sky('s')+stars(50,180,4)+burst2(300,110,70,'#ffd36b')+burst2(880,90,90,'#ff6b6b')+burst2(620,170,50,'#ffffff')+burst2(1050,190,40,'#6ad1ff')
+    b+='<circle cx="600" cy="330" r="80" fill="#ffd27a" opacity=".55"/>'+hills(330,26,'#3a1a2a',8)
+    for x,sc in ((80,1.4),(1120,1.3),(400,.8),(820,.9)):
+        b+=f'<g transform="translate({x} 380) scale({sc})"><rect x="-6" y="-60" width="12" height="70" fill="#1a0c10"/>'+''.join(f'<circle cx="{r.uniform(-40,40):.0f}" cy="{r.uniform(-120,-50):.0f}" r="{r.uniform(22,36):.0f}" fill="#1f0e18"/>' for _ in range(7))+'</g>'
+    f=lambda x:250+40*math.sin(math.pi*((x%600)/600)); b+='<path d="M'+' L'.join(f'{x} {f(x):.0f}' for x in range(0,1201,20))+'" fill="none" stroke="#2a1018" stroke-width="2"/>'
+    b+='<g filter="url(#gw)">'+''.join(f'<circle cx="{x}" cy="{f(x)+6:.0f}" r="4" fill="{["#ffd36b","#ff6b6b","#ffffff","#6ad1ff"][i%4]}"/>' for i,x in enumerate(range(15,1200,40)))+'</g>'
+    b+='<rect y="380" width="1200" height="140" fill="url(#g)"/>'
+    return svg(b,d)
+def fathers():
+    r=random.Random(71); d=lg('s',[(0,'#4aa8ff'),(.7,'#a8dcff'),(1,'#e8f6ff')])+lg('g',[(0,'#7ac46a'),(1,'#3f8a3a')])+lg('w',[(0,'#b07a4a'),(1,'#8a5a32')])
+    b=sky('s')+'<circle cx="1040" cy="90" r="46" fill="#fff6c0"/><circle cx="1040" cy="90" r="90" fill="#fff6c0" opacity=".25"/>'
+    b+=''.join(f'<g fill="#fff" opacity=".95"><ellipse cx="{x}" cy="{y}" rx="80" ry="24"/><ellipse cx="{x+34}" cy="{y-16}" rx="46" ry="26"/><ellipse cx="{x-34}" cy="{y-8}" rx="38" ry="20"/></g>' for x,y in ((200,100),(560,70),(820,150)))
+    b+=''.join(f'<rect x="{x}" y="250" width="56" height="130" fill="url(#w)" stroke="#6a4424" stroke-width="2"/>' for x in range(0,1200,58))+'<rect y="268" width="1200" height="8" fill="#6a4424" opacity=".6"/>'
+    b+='<rect x="140" y="140" width="24" height="240" fill="#5a3a20"/>'+''.join(f'<circle cx="{152+r.uniform(-90,90):.0f}" cy="{r.uniform(60,190):.0f}" r="{r.uniform(36,62):.0f}" fill="{r.choice(["#3f8a3a","#4fa046","#2f7a32"])}"/>' for _ in range(12))
+    f=lambda x:60+30*math.sin(math.pi*((x%400)/400)); b+='<path d="M'+' L'.join(f'{x} {f(x):.0f}' for x in range(0,1201,20))+'" fill="none" stroke="#3a2a1a" stroke-width="2"/>'
+    b+=''.join(f'<circle cx="{x}" cy="{f(x)+6:.0f}" r="5" fill="#fff3b0" stroke="#e6c25a"/>' for x in range(20,1200,40))
+    b+='<rect y="370" width="1200" height="150" fill="url(#g)"/>'+''.join(f'<path d="M{r.uniform(0,1200):.0f} {r.uniform(380,515):.0f}l3-8 3 8" stroke="#2f7a32" stroke-width="2" fill="none"/>' for _ in range(160))
+    b+=''.join(f'<path d="M{x} 330c-20-30 20-50 0-80s20-50 0-80" stroke="#fff" stroke-width="{w}" fill="none" opacity=".25" stroke-linecap="round"/>' for x,w in ((700,14),(760,10)))
+    return svg(b,d)
+def crane(x,y,s,c):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{c}" stroke-width="5" fill="none">'
+        '<path d="M0 0V-300M14 0V-300M0-300H14"/>'+''.join(f'<path d="M0 {-k}L14 {-k-20}"/>' for k in range(0,300,20))+
+        '<path d="M-80-300H260M-80-300L7-340 260-300M7-340V-300"/><path d="M200-300V-200" stroke-width="2"/><rect x="190" y="-200" width="20" height="16" fill="'+c+'"/><rect x="-80" y="-310" width="40" height="24" fill="'+c+'"/></g>')
+def labor():
+    d=lg('s',[(0,'#0e1a3a'),(.5,'#3a3a6a'),(.82,'#f08a4a'),(1,'#ffd27a')])+rg('sun',[(0,'#fff0c0'),(1,'#ff9a4a')])
+    b=sky('s')+stars(30,140,6)+'<circle cx="760" cy="350" r="110" fill="url(#sun)" opacity=".95"/>'
+    b+=skyline(23,400,60,190,'#1a1a34',lit='#ffcf6a',p=.2)+crane(240,400,1,'#14142a')+crane(980,400,.8,'#14142a')
+    b+='<g fill="#14142a"><rect x="520" y="160" width="160" height="240" fill="none" stroke="#14142a" stroke-width="6"/>'+''.join(f'<rect x="520" y="{y}" width="160" height="6"/>' for y in range(160,400,40))+''.join(f'<rect x="{x}" y="160" width="6" height="240"/>' for x in range(520,681,40))+'</g>'
+    b+='<path d="M0 400H1200" stroke="#14142a" stroke-width="10"/>'+''.join(f'<path d="M{x} 400L{x+40} 360L{x+80} 400" stroke="#14142a" stroke-width="5" fill="none"/>' for x in range(0,1200,80))
+    b+='<rect y="404" width="1200" height="116" fill="#2a2a3a"/>'+''.join(f'<rect x="{x}" y="452" width="60" height="6" fill="#ffc247" opacity=".6"/>' for x in range(20,1200,120))
+    return svg(b,d)
+def palm(x,y,s):
+    return (f'<g transform="translate({x} {y}) scale({s})"><path d="M0 0C4-40 10-80 4-120" stroke="#3a2a1a" stroke-width="8" fill="none"/>'
+        +''.join(f'<path d="M4-120c{dx}-{dy} {dx*2}-{dy//2} {dx*3} 10" stroke="#1f6a4a" stroke-width="7" fill="none" stroke-linecap="round"/>' for dx,dy in ((14,20),(-14,20),(10,34),(-10,34),(18,6),(-18,6)))+'</g>')
+def columbus():
+    r=random.Random(81); d=lg('s',[(0,'#5ab8ff'),(1,'#c8ecff')])+lg('sea',[(0,'#1fa8b8'),(1,'#0b5a7a')])+lg('sand',[(0,'#f2d79a'),(1,'#d8b46a')])
+    b=sky('s')+'<circle cx="200" cy="100" r="48" fill="#fff6c0"/><circle cx="200" cy="100" r="100" fill="#fff6c0" opacity=".25"/>'
+    b+=''.join(f'<g fill="#fff" opacity=".9"><ellipse cx="{x}" cy="{y}" rx="70" ry="20"/><ellipse cx="{x+28}" cy="{y-12}" rx="38" ry="20"/></g>' for x,y in ((520,90),(900,70),(1100,140)))
+    b+='<rect y="250" width="1200" height="170" fill="url(#sea)"/>'
+    b+='<path d="M640 252c40-40 120-40 160 0z" fill="#2f7a5a"/><path d="M880 254c30-24 80-24 110 0z" fill="#3a8a62"/>'+palm(720,236,.5)+palm(760,240,.4)
+    b+='<g transform="translate(360 300)"><path d="M-60 0h120l-18 22h-84z" fill="#5a3a1e"/><path d="M0 0V-110" stroke="#3a2a1a" stroke-width="4"/><path d="M4-104c40 20 44 60 0 96z" fill="#fff"/><path d="M-4-96c-30 18-34 50 0 82z" fill="#f2f2f2"/><path d="M0-110l18 6-18 6z" fill="#d7263d"/></g>'
+    b+=''.join(f'<path d="M{r.uniform(0,1200):.0f} {r.uniform(270,410):.0f}q8-6 16 0t16 0" stroke="#bff4ff" stroke-width="2" fill="none" opacity=".6"/>' for _ in range(60))
+    b+=''.join(f'<path d="M{x} {y}q8-8 16 0q8-8 16 0" stroke="#1a2a3a" stroke-width="2.5" fill="none"/>' for x,y in ((560,150),(610,130),(1000,200)))
+    b+='<path d="M0 410C200 392 400 420 600 404S1000 396 1200 410V520H0Z" fill="url(#sand)"/><path d="M0 410C200 392 400 420 600 404S1000 396 1200 410" stroke="#fff" stroke-width="4" fill="none" opacity=".7"/>'
+    b+=''.join(f'<circle cx="{r.uniform(0,1200):.0f}" cy="{r.uniform(430,515):.0f}" r="{r.uniform(1.5,3.5):.1f}" fill="#c89a5a" opacity=".6"/>' for _ in range(120))
+    return svg(b,d)
+def em2():
+    E={}
+    E['mlk']=badge(dove(50,56,1.15)+'<path d="M64 54c8 2 16 0 22-6M74 52l4-6M80 50l2-7" stroke="#4a9a52" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="80" cy="44" rx="3" ry="5" fill="#6ac46a"/>','#4a5aa8','#141a44')
+    E['presidents']=badge('<circle cx="50" cy="50" r="30" fill="#f5c542" stroke="#a8740c" stroke-width="3"/><circle cx="50" cy="50" r="24" fill="none" stroke="#a8740c" stroke-dasharray="2 3"/><path d="M50 34l4.5 9.5 10.5 1-8 7 2.5 10.5-9.5-5.5-9.5 5.5 2.5-10.5-8-7 10.5-1z" fill="#a8740c"/>','#3b57c8','#0c1440')
+    E['mothers_day']=badge('<path d="M50 84V54M50 70c-10-4-16-12-16-20M50 66c10-4 16-12 16-20" stroke="#3a8a3a" stroke-width="3" fill="none"/>'+bloom(50,42,2.2,'#ff6fa8')+bloom(32,52,1.3,'#ffd36b','#ff8a1f')+bloom(68,52,1.3,'#c79bff'),'#ff9ac1','#7a1e4a')
+    E['juneteenth']=badge('<path d="M8 62Q50 40 92 62V92H8z" fill="#d7263d" opacity=".9"/>'+''.join(f'<path d="M50 46L{50+math.cos(a)*30:.0f} {46+math.sin(a)*30:.0f}" stroke="#fff" stroke-width="2" opacity=".8"/>' for a in [i*math.pi/6 for i in range(12)])+'<path d="M50 32l4 9 10 1-8 6 3 10-9-6-9 6 3-10-8-6 10-1z" fill="#fff" stroke="#d7263d" stroke-width="1.5"/>','#3b57c8','#14123a')
+    E['fathers_day']=badge('<path d="M42 18h16l-3 10 10 44-15 16-15-16 10-44z" fill="#3b7bd8" stroke="#163a7a" stroke-width="2.5" stroke-linejoin="round"/><path d="M44 38l14-4M43 50l17-5M43 62l18-5" stroke="#ffb347" stroke-width="4"/><path d="M42 18h16l-3 10H45z" fill="#2a5aa8"/>','#5fb0ff','#0e2a5a')
+    E['labor']=badge('<path d="M20 64c0-22 13-36 30-36s30 14 30 36z" fill="#ffc247" stroke="#a8740c" stroke-width="3"/><rect x="14" y="62" width="72" height="10" rx="5" fill="#ffd36b" stroke="#a8740c" stroke-width="3"/><path d="M50 28v34M40 32c-2 10-2 20 0 30M60 32c2 10 2 20 0 30" stroke="#a8740c" stroke-width="2.5" fill="none"/>','#3a6ab8','#0e1a3a')
+    E['columbus']=badge('<circle cx="50" cy="50" r="30" fill="#0e3a4a" stroke="#ffd36b" stroke-width="2.5"/><path d="M50 18l6 32-6 32-6-32z" fill="#ffd36b"/><path d="M18 50l32-6 32 6-32 6z" fill="#3fd6c6"/><path d="M50 18l6 32h-12z" fill="#ff6b6b"/><circle cx="50" cy="50" r="4" fill="#fff"/>','#3fd6c6','#0b3a4a')
+    return E
+def reward2(kind):
+    d=rg('halo',[(0,'rgba(255,255,255,.28)'),(1,'rgba(255,255,255,0)')])+lg('gold',[(0,'#fff1b0'),(.5,'#f5c542'),(1,'#a8740c')])+GLOW
+    b='<circle cx="80" cy="80" r="78" fill="url(#halo)"/>'
+    if kind=='bouquet':
+        b+='<path d="M80 140L58 80h44z" fill="#ffe0ee" stroke="#e0508a" stroke-width="2.5"/><path d="M66 112l28-8" stroke="#ff6fa8" stroke-width="6"/>'
+        b+=bloom(80,62,2.6,'#ff4d7a')+bloom(56,72,2,'#ffd36b','#ff8a1f')+bloom(104,72,2,'#c79bff')+bloom(70,44,1.6,'#ff9ac1')+bloom(94,46,1.6,'#ffffff')
+    elif kind=='burger':
+        b+=('<path d="M34 76c0-26 20-40 46-40s46 14 46 40z" fill="#e8a24a" stroke="#8a5a1a" stroke-width="3"/>'+''.join(f'<ellipse cx="{x}" cy="{y}" rx="3" ry="1.6" fill="#fff6d8"/>' for x,y in ((60,56),(80,48),(100,56),(70,66),(92,66)))+
+            '<path d="M30 78h100l-8 8H38z" fill="#5ac45a"/><rect x="32" y="84" width="96" height="16" rx="7" fill="#7a3a1a"/><path d="M34 100l10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 6-8z" fill="#ffd36b"/><path d="M36 108h88c0 12-10 20-24 20H60c-14 0-24-8-24-20z" fill="#e8a24a" stroke="#8a5a1a" stroke-width="3"/>')
+    elif kind=='chest':
+        b+=('<rect x="30" y="74" width="100" height="56" rx="6" fill="#8a5a2a" stroke="#4a2a10" stroke-width="3"/><path d="M30 76c0-26 22-40 50-40s50 14 50 40z" fill="#a8703a" stroke="#4a2a10" stroke-width="3"/>'
+            '<path d="M30 76h100M48 44v86M112 44v86" stroke="#e6b84a" stroke-width="5"/><rect x="72" y="70" width="16" height="20" rx="3" fill="url(#gold)" stroke="#8a5a00" stroke-width="2"/>'
+            +''.join(f'<circle cx="{x}" cy="{y}" r="7" fill="url(#gold)" stroke="#8a5a00" stroke-width="1.5" filter="url(#glow)"/>' for x,y in ((26,128),(136,124),(120,136))))
+    elif kind=='dove':
+        b+=f'<g filter="url(#glow)">{dove(80,84,2.4)}</g><path d="M118 76c10 4 20 2 26-6M130 74l4-7M138 71l2-7" stroke="#4a9a52" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    elif kind=='medal':
+        b+='<circle cx="80" cy="80" r="50" fill="url(#gold)" stroke="#8a5a00" stroke-width="4"/><circle cx="80" cy="80" r="40" fill="none" stroke="#8a5a00" stroke-dasharray="3 4" stroke-width="2"/><path d="M80 54l7.5 15.5 17 2-12.5 12 3 17-15-8-15 8 3-17-12.5-12 17-2z" fill="#a8740c"/><path d="M50 24l10 18M110 24l-10 18" stroke="#ffd36b" stroke-width="3" opacity=".8" filter="url(#glow)"/>'
+    return svg(b,d,'0 0 160 160','xMidYMid meet')
+for n,f in (('mlk',mlk),('presidents',presidents),('mothers_day',mothers),('juneteenth',juneteenth),('fathers_day',fathers),('labor',labor),('columbus',columbus)): out(n,'scene',f())
+for n,s in em2().items(): out(n,'emblem',s)
+for k in ('bouquet','burger','chest','dove','medal'): out('rewards',k,reward2(k))

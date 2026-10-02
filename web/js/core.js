@@ -36,6 +36,12 @@ const ICON = {
   check: '<path d="M4.5 12.5l5 5L19.5 7"/>',
   spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>',
   door: '<path d="M5 21V4.5A1.5 1.5 0 016.5 3h11A1.5 1.5 0 0119 4.5V21M3 21h18M15 12h.01"/>',
+  coin: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5" stroke-dasharray="1.5 2"/><path d="M12 9.2l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z"/>',
+  flower: '<circle cx="12" cy="9" r="2.2"/><path d="M12 6.8c0-3 3.5-3 3.5-.5M14.2 9c3 0 3 3.5.5 3.5M12 11.2c0 3-3.5 3-3.5.5M9.8 9c-3 0-3-3.5-.5-3.5M12 11.5V21M12 17c-2.5 0-4-1.5-4.5-3.5M12 18.5c2.5 0 4-1.5 4.5-3.5"/>',
+  compass: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  pen: '<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5zM13.5 7l3 3M4 20h16"/>',
+  hardhat: '<path d="M4 16a8 8 0 0116 0M3 16h18v3H3zM10 8.3V12M14 8.3V12"/>',
+  grill: '<path d="M4 10h16a8 8 0 01-16 0zM8 17.5L6 21M16 17.5l2 3.5M12 18v3M9 3c-1 1.5 1 2.5 0 4M13 3c-1 1.5 1 2.5 0 4"/>',
 };
 const icon = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ICON.star}</svg>`;
 
@@ -52,7 +58,8 @@ function theme(t) {
 
 const EXPERIENCES = {}; // kind -> render(event)
 
-const HAS_ART = new Set(['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'veterans']);
+const HAS_ART = new Set(['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'veterans',
+  'mlk', 'presidents', 'mothers_day', 'juneteenth', 'fathers_day', 'labor', 'columbus']); // every holiday now has its own art
 const emblemSrc = (id) => `img/${HAS_ART.has(id) ? id : 'default'}/emblem.svg`; // holidays without custom art share the default badge
 const heroSrc = (id) => HAS_ART.has(id) ? `img/${id}/scene.svg` : 'img/default/hero.svg';
 
@@ -75,26 +82,43 @@ function dateBadge(iso) {
   return m ? `<span class="dt"><i>${MONTHS[m - 1]}</i><em>${d}</em></span>` : '<span class="dt"></span>';
 }
 
+/* The holiday on screen: the one the player picked in "Happening now", else the headline holiday */
+const current = (s) => (s.sel && s.active.find(x => x.id === s.sel)) || s.active[0] || s.upcoming[0];
+
+function renderNow(s, h) { // switcher shown when more than one holiday is running at once
+  const el = $('#now'), live = s.active.filter(x => x.id === 'christmas' ? s.advent : s.events ? s.events[x.id] : s.event && s.event.id === x.id);
+  el.hidden = live.length < 2; if (el.hidden) return;
+  el.innerHTML = `<h2>Happening now</h2><div class="sw-list">${live.map(x => `<button class="pick${x.id === h.id ? ' on' : ''}" data-sel="${esc(x.id)}"><img src="${emblemSrc(x.id)}" alt=""><span>${esc(x.label)}</span></button>`).join('')}</div>`;
+}
+$('#now').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sel]'); if (!b || busy || !state) return;
+  state.sel = b.dataset.sel; say(''); render(state);
+});
+
 function render(s) {
-  state = s; theme(s.theme);
-  const h = s.active[0] || s.upcoming[0];
+  state = s;
+  const h = current(s);
+  theme((h && h.theme) || s.theme);
+  if (s.events && h) s.event = s.events[h.id] || null; // the experience that matches the holiday on screen
   $('#title').textContent = h ? h.label : 'No holidays scheduled';
   $('#blurb').textContent = h ? h.blurb || '' : '';
   $('#countdown').textContent = h ? when(h.daysUntil) : '';
   $('#eyebrow').textContent = s.active.length ? 'Seasonal event' : h ? 'Next on the calendar' : '';
   $('#today').textContent = s.date;
 
-  $('.side h2').textContent = 'Coming up'; $('#upcoming').className = ''; // the Halloween contest swaps these for its leaderboard
-  const list = s.active.slice(1).concat(s.upcoming).slice(0, 5);
+  $('.list-card h2').textContent = 'Coming up'; $('#upcoming').className = ''; // the Halloween contest swaps these for its leaderboard
+  renderNow(s, h);
+  const list = ($('#now').hidden ? s.active.filter(x => x !== h) : []).concat(s.upcoming).slice(0, 5); // running holidays live in the switcher, not here
   $('#upcoming').innerHTML = list.length
     ? list.map(x => `<li>${dateBadge(x.date)}<div class="tx"><b>${esc(x.label)}</b><span>${when(x.daysUntil)}</span></div></li>`).join('')
     : '<li><span>Nothing else on the calendar.</span></li>';
 
   stopAmbient(); setStats([]); setExtra('');
-  const id = s.advent ? 'christmas' : (s.event && s.event.id) || '';
+  const advent = s.advent && (!h || h.id === 'christmas');
+  const id = advent ? 'christmas' : (s.event && s.event.id) || '';
   app.dataset.holiday = id;
   setEmblem(id || (h && h.id) || '');
-  if (s.advent) renderAdvent(s.advent);
+  if (advent) renderAdvent(s.advent);
   else if (s.event && EXPERIENCES[s.event.kind]) EXPERIENCES[s.event.kind](s.event);
   else renderEmpty(s);
 }
@@ -109,7 +133,9 @@ function renderEmpty(s) { // observance days and quiet stretches
 
 /* Reward art by outcome kind (img/rewards/*.svg); anything unknown gets the star */
 const REWARD_ART = { treat: 'candy', trick: 'scare', ghost: 'ghost', empty: 'empty', dud: 'empty', gift: 'gift', basket: 'gift', cash: 'coins', coins: 'coins', egg: 'coins',
-  golden: 'coins', jackpot: 'coins', lucky: 'coins', burst: 'star', finale: 'star', door: 'gift', dish: 'gift', candle: 'star' };
+  golden: 'coins', jackpot: 'coins', lucky: 'coins', burst: 'star', finale: 'star', door: 'gift', dish: 'gift', candle: 'star',
+  silver: 'medal', set: 'coins', gold: 'medal', rose: 'bouquet', tulip: 'bouquet', orchid: 'bouquet', weed: 'empty', burger: 'burger', steak: 'burger', burnt: 'empty',
+  glass: 'chest', map: 'chest', chest: 'chest', pledge: 'dove', cookout: 'burger', punch: 'coins' };
 const rewardSrc = (kind) => kind === 'prize' ? 'img/halloween/trophy.svg' : `img/rewards/${REWARD_ART[kind] || 'star'}.svg`;
 
 function reveal({ head, label, sub, kind, points }) {

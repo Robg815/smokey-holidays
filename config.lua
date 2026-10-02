@@ -21,6 +21,13 @@ Config.Themes = {
     stpatricks   = { a = '#4dff8a', b = '#e6ff7a' },
     spring       = { a = '#c79bff', b = '#8affc7' },
     memorial     = { a = '#7fa8ff', b = '#ff7a7a' },
+    dream        = { a = '#8fb4ff', b = '#ffd36b' },
+    presidents   = { a = '#6f9bff', b = '#ffd36b' },
+    mothers      = { a = '#ff8fc8', b = '#b8f59a' },
+    juneteenth   = { a = '#ff5a4e', b = '#ffd36b' },
+    fathers      = { a = '#5fb0ff', b = '#ffb347' },
+    labor        = { a = '#ffc247', b = '#6ad1ff' },
+    voyage       = { a = '#3fd6c6', b = '#ffd36b' },
 }
 
 -- Rule types:
@@ -31,18 +38,18 @@ Config.Themes = {
 -- Optional per holiday: before / after (window in days), federal (enables observed shifting), enabled = false
 Config.Holidays = {
     { id = 'new_years',    label = "New Year's Day",             federal = true, theme = 'winter',     rule = { type = 'fixed', month = 1, day = 1 },            blurb = 'A fresh year on the streets of Los Santos.' },
-    { id = 'mlk',          label = 'Martin Luther King Jr. Day', federal = true, theme = 'default',    rule = { type = 'nth', month = 1, weekday = 1, n = 3 },   blurb = 'A day on, not a day off.' },
+    { id = 'mlk',          label = 'Martin Luther King Jr. Day', federal = true, theme = 'dream',    rule = { type = 'nth', month = 1, weekday = 1, n = 3 },   blurb = 'A day on, not a day off.' },
     { id = 'valentines',   label = "Valentine's Day",            theme = 'valentines', rule = { type = 'fixed', month = 2, day = 14 },                          blurb = 'Flowers, dinners and questionable decisions.' },
-    { id = 'presidents',   label = "Presidents' Day",            federal = true, theme = 'patriotic',  rule = { type = 'nth', month = 2, weekday = 1, n = 3 },   blurb = 'Big sales at every dealership in town.' },
+    { id = 'presidents',   label = "Presidents' Day",            federal = true, theme = 'presidents',  rule = { type = 'nth', month = 2, weekday = 1, n = 3 },   blurb = 'Big sales at every dealership in town.' },
     { id = 'stpatricks',   label = "St. Patrick's Day",          theme = 'stpatricks', rule = { type = 'fixed', month = 3, day = 17 },                          blurb = 'Green everything. Pubs will be busy.' },
     { id = 'easter',       label = 'Easter',                     theme = 'spring',     rule = { type = 'easter', offset = 0 }, before = 2,                      blurb = 'Egg hunts across the city.' },
-    { id = 'mothers_day',  label = "Mother's Day",               theme = 'valentines', rule = { type = 'nth', month = 5, weekday = 0, n = 2 },                  blurb = 'Call your mom. Seriously.' },
+    { id = 'mothers_day',  label = "Mother's Day",               theme = 'mothers', rule = { type = 'nth', month = 5, weekday = 0, n = 2 },                  blurb = 'Call your mom. Seriously.' },
     { id = 'memorial',     label = 'Memorial Day',               federal = true, theme = 'memorial',   rule = { type = 'last', month = 5, weekday = 1 },         blurb = 'Remembering those who served.' },
-    { id = 'juneteenth',   label = 'Juneteenth',                 federal = true, theme = 'patriotic',  rule = { type = 'fixed', month = 6, day = 19 },           blurb = 'Freedom Day celebrations across the state.' },
-    { id = 'fathers_day',  label = "Father's Day",               theme = 'default',    rule = { type = 'nth', month = 6, weekday = 0, n = 3 },                  blurb = 'Grills are lit. Dad jokes are mandatory.' },
+    { id = 'juneteenth',   label = 'Juneteenth',                 federal = true, theme = 'juneteenth',  rule = { type = 'fixed', month = 6, day = 19 },           blurb = 'Freedom Day celebrations across the state.' },
+    { id = 'fathers_day',  label = "Father's Day",               theme = 'fathers',    rule = { type = 'nth', month = 6, weekday = 0, n = 3 },                  blurb = 'Grills are lit. Dad jokes are mandatory.' },
     { id = 'independence', label = 'Independence Day',           federal = true, theme = 'patriotic',  rule = { type = 'fixed', month = 7, day = 4 }, before = 2, after = 1, blurb = 'Fireworks over the pier tonight.' },
-    { id = 'labor',        label = 'Labor Day',                  federal = true, theme = 'autumn',     rule = { type = 'nth', month = 9, weekday = 1, n = 1 },   blurb = 'Last long weekend of summer.' },
-    { id = 'columbus',     label = "Columbus / Indigenous Peoples' Day", federal = true, theme = 'autumn', rule = { type = 'nth', month = 10, weekday = 1, n = 2 }, blurb = 'Federal holiday. Government offices are closed.' },
+    { id = 'labor',        label = 'Labor Day',                  federal = true, theme = 'labor',     rule = { type = 'nth', month = 9, weekday = 1, n = 1 },   blurb = 'Last long weekend of summer.' },
+    { id = 'columbus',     label = "Columbus / Indigenous Peoples' Day", federal = true, theme = 'voyage', rule = { type = 'nth', month = 10, weekday = 1, n = 2 }, blurb = 'Explore the coast and honor the people who were here first.' },
     { id = 'halloween',    label = 'Halloween',                  theme = 'halloween',  rule = { type = 'fixed', month = 10, day = 31 }, before = 30, after = 7,  blurb = 'The city is not as empty as it looks after dark.' },
     { id = 'veterans',     label = 'Veterans Day',               federal = true, theme = 'memorial',   rule = { type = 'fixed', month = 11, day = 11 },          blurb = 'Honoring all who served.' },
     { id = 'thanksgiving', label = 'Thanksgiving',               federal = true, theme = 'autumn',     rule = { type = 'nth', month = 11, weekday = 4, n = 4 }, before = 2, after = 1, blurb = 'Turkey, family and a lot of traffic.' },
@@ -197,6 +204,83 @@ Config.Events.new_years = {
 -- One candle per player per day. Add `reward = { cash = 100 }` if you want one; remembrance days work well without.
 Config.Events.memorial = { kind = 'tribute', title = 'A Moment of Remembrance', text = 'Light a candle for those who gave everything.', thanks = 'Thank you for remembering.' }
 Config.Events.veterans = { kind = 'tribute', title = 'Thank a Veteran', text = 'Light a candle for everyone who served.', thanks = 'Thank you for your support.' }
+
+-- ==========================================================================
+-- Every other holiday gets its own activity too. `style` picks the scene for the shared kinds:
+--   tribute: 'candle' (default) | 'pledge'          feast: 'table' (default) | 'cookout' | 'timecard'
+-- ==========================================================================
+Config.Events.mlk = {
+    kind = 'tribute', style = 'pledge', title = 'A Day On, Not a Day Off',
+    text = 'Sign the pledge to give back to Los Santos today.', button = 'Sign the pledge', done = 'You signed the pledge',
+    unit = { 'signature', 'signatures' }, label = 'Your name is on the wall', thanks = 'Thank you for showing up for your city.',
+    reward = { label = 'Volunteer lunch', items = { { name = 'sandwich', count = 2 }, { name = 'water', count = 2 } } },
+}
+
+Config.Events.presidents = {
+    kind = 'spots', title = 'Presidential Mint', spots = 6, picks = 2,
+    outcomes = {
+        { kind = 'silver', weight = 45, label = 'Silver dollar',        cash = 400,  msg = 'Freshly struck and still warm.' },
+        { kind = 'set',    weight = 20, label = 'Collector set',        items = { { name = 'radio', count = 1 } }, cash = 250, msg = 'A boxed set with a radio thrown in.' },
+        { kind = 'gold',   weight = 7,  label = 'Gold presidential coin', cash = 2500, msg = 'One in a thousand. Do not spend it.' },
+        { kind = 'dud',    weight = 28, label = 'Wooden nickel',        msg = 'Somebody is having a laugh.' },
+    },
+}
+
+Config.Events.mothers_day = {
+    kind = 'spots', title = 'Bouquet for Mom', spots = 6, picks = 2,
+    outcomes = {
+        { kind = 'rose',   weight = 40, label = 'Red roses',   cash = 300, msg = 'A dozen, perfectly wrapped.' },
+        { kind = 'tulip',  weight = 30, label = 'Tulips',      items = { { name = 'sandwich', count = 2 }, { name = 'cola', count = 2 } }, msg = 'With brunch on the side.' },
+        { kind = 'orchid', weight = 8,  label = 'Rare orchid', cash = 2000, msg = 'Mom is going to love this one.' },
+        { kind = 'weed',   weight = 22, label = 'Just weeds',  msg = 'It is the thought that counts.' },
+    },
+}
+
+Config.Events.juneteenth = {
+    kind = 'feast', style = 'cookout', title = 'Freedom Day Cookout',
+    dishes = { -- need = minutes online today
+        { id = 'ribs',       label = 'Barbecue ribs',    need = 5,  items = { { name = 'burger', count = 2 } },  msg = 'Fall off the bone.' },
+        { id = 'watermelon', label = 'Watermelon',       need = 10, items = { { name = 'water', count = 2 } },   msg = 'Ice cold and sweet.' },
+        { id = 'redvelvet',  label = 'Red velvet cake',  need = 15, cash = 300, msg = 'The red is the whole point.' },
+        { id = 'soda',       label = 'Strawberry soda',  need = 20, items = { { name = 'cola', count = 3 } },    msg = 'Red drinks, by tradition.' },
+        { id = 'cornbread',  label = 'Cornbread',        need = 25, items = { { name = 'sandwich', count = 2 } }, msg = 'Honey butter on top.' },
+        { id = 'greens',     label = 'Collard greens',   need = 30, cash = 500, msg = 'Slow cooked all morning.' },
+    },
+    finale = { label = 'Raise a glass to freedom', cash = 2000, items = { { name = 'armour', count = 1 } }, msg = 'Celebrating with the whole city.' },
+}
+
+Config.Events.fathers_day = {
+    kind = 'spots', title = 'Grill Master', spots = 6, picks = 3,
+    outcomes = {
+        { kind = 'burger',  weight = 45, label = 'Perfect burger', items = { { name = 'burger', count = 2 } }, msg = 'Medium, with a crust. Dad would be proud.' },
+        { kind = 'steak',   weight = 20, label = 'Prime steak',    cash = 500, msg = 'Resting on the board like a pro.' },
+        { kind = 'gift',    weight = 8,  label = 'Golden spatula', cash = 2000, msg = 'Official grill master of the year.' },
+        { kind = 'burnt',   weight = 27, label = 'Burnt to a crisp', msg = 'Charcoal. Do not tell anyone.' },
+    },
+}
+
+Config.Events.labor = {
+    kind = 'feast', style = 'timecard', title = 'Punch the Clock',
+    dishes = { -- one punch per shift, unlocked by minutes online today
+        { id = 'clockin',   label = 'Clock in',        need = 5,  cash = 150, msg = 'On time. Look at you.' },
+        { id = 'coffee',    label = 'Coffee break',    need = 10, items = { { name = 'water', count = 2 } }, msg = 'Fifteen minutes, not sixteen.' },
+        { id = 'lunch',     label = 'Lunch break',     need = 15, items = { { name = 'sandwich', count = 2 } }, msg = 'Brown bag special.' },
+        { id = 'afternoon', label = 'Afternoon shift', need = 20, cash = 300, msg = 'Halfway to the weekend.' },
+        { id = 'overtime',  label = 'Overtime',        need = 25, items = { { name = 'repairkit', count = 1 } }, msg = 'Time and a half.' },
+        { id = 'clockout',  label = 'Clock out',       need = 30, cash = 500, msg = 'Long weekend starts now.' },
+    },
+    finale = { label = 'Payday', cash = 2500, msg = 'Holiday pay hits different.' },
+}
+
+Config.Events.columbus = {
+    kind = 'spots', title = 'Explore the Coast', spots = 6, picks = 2,
+    outcomes = {
+        { kind = 'glass', weight = 40, label = 'Sea glass',        cash = 250, msg = 'Smoothed by a hundred years of tide.' },
+        { kind = 'map',   weight = 25, label = 'Old map fragment', items = { { name = 'radio', count = 1 } }, msg = 'Someone hid a radio with it.' },
+        { kind = 'chest', weight = 7,  label = 'Sunken chest',     cash = 2500, msg = 'Waterlogged, and full.' },
+        { kind = 'empty', weight = 28, label = 'Just sand',        msg = 'Nothing but sand and a crab.' },
+    },
+}
 
 -- ==========================================================================
 -- Ghosts in the world (Halloween). Deliberately conservative:

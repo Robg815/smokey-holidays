@@ -6,7 +6,8 @@ chk('epoch', Dates.toDays(1970,1,1) == 0)
 for _, k in ipairs({0, 1, 59, 365, 10957, 20727, -1, 50000}) do local y,m,d = Dates.fromDays(k); chk('roundtrip '..k, Dates.toDays(y,m,d) == k) end
 local function on(s) local y,m,d = s:match('(%d+)-(%d+)-(%d+)'); y,m,d=tonumber(y),tonumber(m),tonumber(d); local a,u = Dates.evaluate(Dates.toDays(y,m,d), y); return a,u end
 local function ids(l) local t={} for _,e in ipairs(l) do t[#t+1]=e.id..'@'..e.date..'('..e.daysUntil..')' end return table.concat(t,' ') end
-local a = on('2026-10-12'); chk('halloween headlines over columbus', a[1].id == 'halloween' and a[2].id == 'columbus')
+local a = on('2026-10-12'); chk('columbus (its day) headlines, halloween still active', a[1].id == 'columbus' and a[2].id == 'halloween')
+local a4 = on('2026-10-20'); chk('halloween headlines over plain observance days', a4[1].id == 'halloween')
 chk('easter 2026 = Apr 5', ({on('2026-04-05')})[1][1].date == '2026-04-05')
 chk('thanksgiving 2026 = Nov 26', ({on('2026-11-26')})[1][1].date == '2026-11-26')
 chk('memorial 2026 = May 25', ({on('2026-05-25')})[1][1].date == '2026-05-25')

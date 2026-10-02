@@ -186,7 +186,7 @@ end
 function Events.state(src, h, y, m, d)
     local cfg, cid = cfgFor(h.id), cidOf(src)
     if not cfg or not cid then return end
-    local out = { id = h.id, kind = cfg.kind, title = cfg.title }
+    local out = { id = h.id, kind = cfg.kind, title = cfg.title, style = cfg.style }
 
     if cfg.kind == 'spots' then
         local base = Dates.toDays(y, m, d) * 100
@@ -247,7 +247,8 @@ function Events.state(src, h, y, m, d)
         local day = Dates.toDays(y, m, d)
         out.lit = #rows(cid, h.id, y, day, day) > 0
         out.total = MySQL.scalar.await('SELECT COUNT(*) FROM s2_holiday_claims WHERE event = ? AND year = ?', { h.id, y }) or 0
-        out.text = cfg.text
+        out.text, out.button, out.done, out.unit = cfg.text, cfg.button, cfg.done, cfg.unit
+        out.reward = cfg.reward and cfg.reward.label or nil
     end
     return out
 end
@@ -317,7 +318,7 @@ local function play(src, cid, id, cfg, arg, y, m, d)
         if cfg.reward and not canCarry(src, cfg.reward) then return FULL end
         if not insert(cid, id, y, day) then return { ok = false, msg = 'Too slow.' } end
         if cfg.reward then give(src, cfg.reward) end
-        return { ok = true, label = 'A candle burns for them', msg = cfg.thanks or 'Thank you.' }
+        return { ok = true, label = cfg.label or 'A candle burns for them', msg = cfg.thanks or 'Thank you.', kind = cfg.style == 'pledge' and 'pledge' or 'candle' }
     end
     return { ok = false, msg = 'Invalid request.' }
 end

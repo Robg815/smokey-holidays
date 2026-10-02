@@ -6,6 +6,13 @@
 [data-holiday=independence] h1 { font: 800 clamp(28px,4.4vh,40px)/1.05 'Arial Narrow', Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
 [data-holiday=thanksgiving] h1 { font: 700 clamp(32px,5vh,46px)/1.05 Georgia, serif; text-shadow: 0 0 20px rgba(255,179,71,.4); }
 [data-holiday=new_years_eve] h1, [data-holiday=new_years] h1 { font: 200 clamp(32px,5vh,48px)/1.05 'Bahnschrift', 'Segoe UI', sans-serif; letter-spacing: .05em; }
+[data-holiday=mlk] h1 { font: 600 clamp(30px,4.6vh,44px)/1.05 Georgia, serif; text-shadow: 0 0 24px rgba(255,211,107,.35); }
+[data-holiday=presidents] h1 { font: 700 clamp(30px,4.6vh,44px)/1.05 Palatino, 'Palatino Linotype', 'Book Antiqua', serif; letter-spacing: .02em; text-shadow: 0 0 22px rgba(255,211,107,.35); }
+[data-holiday=mothers_day] h1 { font: italic 400 clamp(32px,5vh,48px)/1.05 Georgia, serif; text-shadow: 0 0 22px rgba(255,143,200,.45); }
+[data-holiday=juneteenth] h1 { font: 800 clamp(30px,4.6vh,44px)/1.05 var(--display); text-shadow: 0 0 24px rgba(255,90,78,.45); }
+[data-holiday=fathers_day] h1 { font: 700 clamp(30px,4.6vh,44px)/1.05 'Trebuchet MS', var(--display); }
+[data-holiday=labor] h1 { font: 700 clamp(30px,4.8vh,46px)/1.0 'Bahnschrift SemiBold Condensed', 'Bahnschrift', 'Arial Narrow', sans-serif; letter-spacing: .01em; }
+[data-holiday=columbus] h1 { font: italic 700 clamp(30px,4.6vh,44px)/1.05 Palatino, 'Palatino Linotype', 'Book Antiqua', serif; text-shadow: 0 0 22px rgba(63,214,198,.4); }
 [data-holiday=memorial] h1, [data-holiday=veterans] h1 { font: 400 clamp(30px,4.6vh,44px)/1.05 Georgia, serif; letter-spacing: .02em; }
 
 /* Scene base */
@@ -21,12 +28,28 @@
 .sc-thanksgiving { background-image: url(../img/thanksgiving/scene.svg); background-color: #2a1608; }
 .sc-memorial { background-image: url(../img/memorial/scene.svg); background-color: #0a1030; }
 .sc-veterans { background-image: url(../img/veterans/scene.svg); background-color: #1a2a5a; }
+.sc-mlk { background-image: url(../img/mlk/scene.svg); background-color: #2a1f4a; }
+.sc-presidents { background-image: url(../img/presidents/scene.svg); background-color: #0c1440; }
+.sc-mothers_day { background-image: url(../img/mothers_day/scene.svg); background-color: #ffe0ec; }
+.sc-juneteenth { background-image: url(../img/juneteenth/scene.svg); background-color: #4a1428; }
+.sc-fathers_day { background-image: url(../img/fathers_day/scene.svg); background-color: #6ab8ff; }
+.sc-labor { background-image: url(../img/labor/scene.svg); background-color: #1a1a34; }
+.sc-columbus { background-image: url(../img/columbus/scene.svg); background-color: #5ab8ff; }
 
 /* Pick-and-reveal spots */
 .spots { inset: auto 0 0 0; z-index: 4; display: flex; justify-content: space-around; align-items: flex-end; gap: 8px; padding: 0 3% 14px; }
 .spot { all: unset; box-sizing: border-box; flex: 1; max-width: 150px; display: grid; justify-items: center; gap: 4px; cursor: pointer; color: #fff; font-size: 12px; line-height: 1.2; font-weight: 500; text-align: center; transition: transform .18s var(--ease), filter .18s; }
 .sc-halloween .spot, .sc-valentines .spot { max-width: 170px; }
 .sc-new_years .spot { max-width: 130px; }
+.sc-presidents .spot { max-width: 120px; padding-bottom: 6px; } .sc-presidents .spot svg { filter: drop-shadow(0 8px 10px rgba(0,0,0,.6)); }
+.sc-presidents .spot:not([disabled]) svg { animation: coinIdle 3.6s ease-in-out infinite; animation-delay: calc(var(--i) * -.6s); }
+@keyframes coinIdle { 50% { transform: rotateY(25deg) translateY(-3px); } }
+.sc-mothers_day .spot, .sc-fathers_day .spot { max-width: 120px; }
+.sc-columbus .spot { max-width: 140px; }
+.shine { inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(105deg, transparent 40%, rgba(255,230,160,.12) 50%, transparent 60%); background-size: 250% 100%; animation: sheen 6s linear infinite; }
+@keyframes sheen { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+.tide { left: -5%; right: -5%; top: 71%; height: 26px; z-index: 2; pointer-events: none; border-radius: 50%; background: rgba(255,255,255,.35); filter: blur(4px); animation: tide 7s ease-in-out infinite alternate; }
+@keyframes tide { to { transform: translateY(10px) scaleX(1.03); opacity: .5; } }
 .boot .spot { animation: seat .55s var(--ease) both; animation-delay: calc(.2s + var(--i) * 70ms); }
 .spot svg { width: 100%; height: auto; max-height: 26vh; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
 .sc-valentines .spot svg { filter: drop-shadow(0 0 14px rgba(255,111,181,.45)); }
@@ -45,6 +68,8 @@
 .amb.coin { border-radius: 50%; box-shadow: inset -2px -2px 0 rgba(0,0,0,.2); }
 .amb.confetti { width: calc(7px * var(--s)); height: calc(13px * var(--s)); border-radius: 1px; }
 .amb.star { width: calc(8px * var(--s)); height: calc(8px * var(--s)); clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); animation: twinkle 2.4s ease-in-out infinite alternate; }
+.amb.petal { width: calc(10px * var(--s)); height: calc(14px * var(--s)); border-radius: 80% 0 80% 0; opacity: .9; }
+.amb.mote { width: calc(5px * var(--s)); height: calc(5px * var(--s)); border-radius: 50%; box-shadow: 0 0 10px var(--c); opacity: .8; }
 .amb.bat { left: -10%; width: calc(38px * var(--s)); height: auto; background: none; animation: fly linear infinite; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 @keyframes rise { to { transform: translateY(-110vh) rotate(25deg); } }
@@ -150,6 +175,43 @@
 .grace.ready { animation: graceGlow 1.6s ease-in-out infinite; }
 @keyframes graceGlow { 50% { box-shadow: 0 0 22px rgba(var(--b-rgb), .65); } }
 
+/* Juneteenth cookout: red gingham picnic cloth instead of the Thanksgiving table */
+.cloth.gingham { background: repeating-linear-gradient(0deg, rgba(255,255,255,.55) 0 22px, transparent 22px 44px), repeating-linear-gradient(90deg, rgba(255,255,255,.55) 0 22px, transparent 22px 44px), #c4262f;
+  box-shadow: inset 0 0 0 3px #fff3, inset 0 0 70px rgba(0,0,0,.35), 0 12px 30px rgba(0,0,0,.5); }
+.sc-juneteenth .dish small { padding: 4px 10px; border-radius: 8px; color: #fff; background: rgba(20,8,14,.82); text-shadow: none; }
+
+/* Labor Day: the time card */
+.timecard { left: 50%; top: 50%; z-index: 4; width: min(560px, 80%); transform: translate(-50%, -50%) rotate(-1.2deg); padding: 18px 22px 16px; border-radius: 6px; color: #2a2a3a;
+  background: repeating-linear-gradient(0deg, transparent 0 31px, rgba(60,90,160,.18) 31px 32px), linear-gradient(#fdf8e8, #f2e8cc); box-shadow: 0 22px 50px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.08); }
+.timecard header { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 2px solid #c4262f; }
+.timecard header b { font: 700 22px/1 'Bahnschrift SemiBold Condensed', 'Bahnschrift', 'Arial Narrow', sans-serif; color: #c4262f; }
+.timecard header span { font-size: 12px; color: #6a6a7a; }
+.timecard ul { list-style: none; padding: 0; }
+.timecard li { display: grid; grid-template-columns: 1fr 70px 150px; align-items: center; gap: 10px; min-height: 40px; border-bottom: 1px dashed rgba(0,0,0,.12); font-size: 14px; }
+.timecard li:last-child { border-bottom: 0; }
+.timecard .sh { font-weight: 600; } .timecard .nd { font-size: 12px; color: #8a8a9a; font-variant-numeric: tabular-nums; }
+.timecard .lock { justify-self: end; font-size: 12px; color: #9a9aaa; }
+.timecard .s-waiting .sh { color: #9a9aaa; }
+.stamp { justify-self: end; padding: 3px 10px; transform: rotate(var(--r)); font: 700 15px/1.2 'Courier New', monospace; color: #c4262f; border: 2px solid #c4262f; border-radius: 4px; opacity: .85; animation: stampIn .35s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes stampIn { from { transform: rotate(var(--r)) scale(1.8); opacity: 0; } }
+.punch { justify-self: end; padding: 7px 16px; font: 700 13px/1 var(--display); color: #fff; cursor: pointer; border: 0; border-radius: 8px; background: linear-gradient(180deg, #2f8a4a, #1f6a36); box-shadow: 0 3px 0 #134a24, 0 0 0 0 rgba(47,138,74,.6); animation: punchGlow 1.6s ease-in-out infinite; }
+.punch:hover { filter: brightness(1.1); } .punch:active { transform: translateY(2px); box-shadow: 0 1px 0 #134a24; }
+@keyframes punchGlow { 50% { box-shadow: 0 3px 0 #134a24, 0 0 0 6px rgba(47,138,74,0); } }
+
+/* MLK Day: the pledge wall */
+.wall { inset: 6% 6% 34% 6%; z-index: 3; display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; gap: 10px; pointer-events: none; }
+.pc { display: grid; place-items: center; width: 108px; height: 54px; padding: 6px; transform: rotate(var(--r)); border-radius: 4px; background: #fdf8e8; box-shadow: 0 6px 14px rgba(0,0,0,.4); }
+.pc svg { width: 100%; }
+.boot .pc { animation: seat .5s var(--ease) both; animation-delay: calc(.3s + var(--i) * 40ms); }
+.candle-btn.pledge { bottom: 8%; gap: 10px; }
+.candle-btn.pledge .card-in { display: grid; justify-items: center; gap: 4px; width: 210px; padding: 16px 14px 12px; border-radius: 8px; color: #1a2a5a; background: #fffdf4;
+  box-shadow: 0 14px 30px rgba(0,0,0,.5), 0 0 0 3px rgba(255,211,107,.0); transition: box-shadow .2s; }
+.candle-btn.pledge:not([disabled]) .card-in { animation: pledgeGlow 1.8s ease-in-out infinite; }
+@keyframes pledgeGlow { 50% { box-shadow: 0 14px 30px rgba(0,0,0,.5), 0 0 0 4px rgba(255,211,107,.7), 0 0 30px rgba(255,211,107,.5); } }
+.candle-btn.pledge .card-in svg { width: 26px; height: 26px; color: #c4262f; }
+.candle-btn.pledge.lit .card-in svg:last-child { width: 120px; height: auto; color: inherit; }
+.candle-btn.pledge b { font: 700 17px/1.2 Georgia, serif; }
+
 /* New Year's Eve: ball drop */
 .ball { left: 50%; top: 12%; z-index: 4; width: clamp(34px, 6vh, 56px); aspect-ratio: 1; margin-left: calc(clamp(34px, 6vh, 56px) / -2); border-radius: 50%; transition: top 1s linear;
   background: conic-gradient(from 20deg, #fff, #9fb4ff, #fff, #ffd86b, #fff, #9fb4ff, #fff); box-shadow: 0 0 30px rgba(255,255,255,.7), 0 0 70px rgba(143,216,255,.5), inset 0 0 12px rgba(0,0,0,.35); }
@@ -168,5 +230,5 @@
 .candle-btn.lit svg path { animation: flicker .6s infinite alternate; transform-origin: 20px 28px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .amb, .ghost, .fog, .cloud, .candle::before, .plate.ready, .grace.ready, .dish.s-served .plate::after, .candle-btn.lit svg path, .boot .spot, .boot .pod, .ghost.lit svg { animation: none; } .ball { transition: none; }
+  .amb, .ghost, .fog, .cloud, .candle::before, .plate.ready, .grace.ready, .dish.s-served .plate::after, .candle-btn.lit svg path, .boot .spot, .boot .pod, .ghost.lit svg, .shine, .tide, .punch, .stamp, .pc, .candle-btn.pledge .card-in, .sc-presidents .spot svg { animation: none; } .ball { transition: none; }
 }

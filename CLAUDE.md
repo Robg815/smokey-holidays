@@ -40,15 +40,17 @@ node --check web/js/*.js         # quick syntax check
 lua5.4 dev/dates_test.lua        # date rules (Easter, nth/last weekday, observed days, windows)
 ```
 Browser preview: open `web/index.html?holiday=<id>` (christmas, halloween, valentines, easter, stpatricks, independence,
-thanksgiving, new_years_eve, new_years, memorial, veterans). Extras: `&force=trick`, `&closed` (contest results), `&art`, `&skin=holo`, `?admin`.
+thanksgiving, new_years_eve, new_years, memorial, veterans, mlk, presidents, mothers_day, juneteenth, fathers_day, labor, columbus). Extras: `&force=trick`, `&closed` (contest results), `&art`, `&skin=holo`, `?admin`.
 Skills: `/preview [id]`, `/smoke-test`.
 
 ## How it fits together
 - Lua to NUI messages: `open{state}`, `refresh{state}`, `close`, `admin{data}`, `adminHide`.
   NUI to Lua callbacks: `claim`, `play`, `close`, `adminDo`, `adminClose`, `adminPreview`.
-- `getState` returns `{date, theme, active[], upcoming[], advent?, event?}`. `render()` in `core.js` dispatches:
+- `getState` returns `{date, theme, active[], upcoming[], advent?, event?, events{id: event}}`. `events` holds every active holiday's
+  experience; when two overlap (Columbus Day inside Halloween) the UI shows a "Happening now" switcher and keeps the pick in `state.sel`. `render()` in `core.js` dispatches:
   `advent` to `renderAdvent`, otherwise `EXPERIENCES[event.kind]`, otherwise the observance card.
-- Experience kinds: `advent`, `spots` (pick-and-reveal), `feast`, `countdown`, `tribute`. To add a kind: config in
+- Experience kinds: `advent`, `spots` (pick-and-reveal), `feast`, `countdown`, `tribute`. `style` reskins a kind:
+  feast `table` | `cookout` (Juneteenth) | `timecard` (Labor Day), tribute `candle` | `pledge` (MLK Day). Every holiday has an event. To add a kind: config in
   `Config.Events`, a branch in `Events.state` and `play` (server/events.lua), a render fn registered in `EXPERIENCES`
   (js/events.js), scene CSS (css/events.css), art, preview data (js/preview.js) and a case in `dev/smoke.py`.
 - Themes are just CSS tokens (`--a`, `--b`, rgb variants) set by `theme()`; holidays never fork the layout.

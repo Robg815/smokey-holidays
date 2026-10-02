@@ -16,8 +16,16 @@ and an admin tablet for testing.
 | New Year's Eve | Ball-drop countdown |
 | New Year's Day | Resolution cards |
 | Memorial Day, Veterans Day | Candle vigil with a city-wide count |
+| Martin Luther King Jr. Day | Pledge wall: sign the day-of-service pledge and see everyone else's signature (volunteer lunch reward) |
+| Presidents' Day | Presidential Mint: flip coins on velvet for silver dollars, collector sets or a rare gold coin |
+| Mother's Day | Bouquet for Mom: pick flowers in the garden, from roses to a rare orchid |
+| Juneteenth | Freedom Day cookout: dishes unlock as you play on a gingham picnic spread, then raise a glass |
+| Father's Day | Grill Master: lift the lids for perfect burgers, prime steak or the golden spatula |
+| Labor Day | Punch the Clock: a paper time card, one punch per shift as you play, then payday |
+| Columbus / Indigenous Peoples' Day | Explore the Coast: dig the marked spots on the beach for sea glass, old maps or a sunken chest |
 
-Other federal holidays get a quiet observance card. Every roll, limit and reward is decided on the server.
+Every holiday on the calendar has its own activity, scene art, emblem and colors. When two run at once (Columbus Day falls
+inside the Halloween month) the menu opens on the one whose day it is and a "Happening now" switcher flips between them. Every roll, limit and reward is decided on the server.
 
 ## Install
 1. Put this folder in your resources as `s2-holidays`.

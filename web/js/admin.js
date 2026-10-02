@@ -1,7 +1,8 @@
 'use strict';
 /* Admin tablet (/holidayadmin). The server owns every rule and permission check; this only renders and sends actions. */
 const adminEl = $('#admin');
-const KIND_LABEL = { advent: 'Advent calendar', spots: 'Pick and reveal', feast: 'Feast table', countdown: 'Countdown', tribute: 'Tribute vigil', observance: 'Observance card' };
+const KIND_LABEL = { advent: 'Advent calendar', spots: 'Pick and reveal', feast: 'Feast table', 'feast:cookout': 'Cookout', 'feast:timecard': 'Time card', countdown: 'Countdown',
+  tribute: 'Candle vigil', 'tribute:pledge': 'Pledge wall', observance: 'Observance card' };
 const TABS = [['overview', 'Overview', 'rank'], ['holidays', 'Holidays', 'calendar'], ['time', 'Time travel', 'clock'], ['halloween', 'Halloween', 'ghost']];
 let admTab = 'overview', admData = null;
 
