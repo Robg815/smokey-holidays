@@ -20,6 +20,9 @@ function mockAdmin(d) {
   else if (a === 'clock') { ADM.clock = d.value || null; ADM.msg = d.value ? 'Fake clock running.' : 'Using real time.'; }
   else if (a === 'resetClaims') ADM.msg = 'Removed 0 of your claims.';
   else if (a === 'playtime') ADM.msg = 'Added 30 minutes of playtime for today.';
+  else if (a === 'teleport') { const w = (PREVIEW_WORLD[d.id] || []).find(x => x.key === d.key); ADM.msg = `Teleported to ${w ? w.title : d.key}, 1 of ${w && w.total || 1}.`; }
+  else if (a === 'gather') ADM.msg = 'Started: 3 players rewarded.';
+  else if (a === 'resetCity') ADM.msg = 'Removed 4 of your city activity claims.';
   else if (a === 'spawnGhost') { ADM.ghosts++; ADM.msg = 'A ghost is on its way. Look around you.'; }
   else if (a === 'clearGhosts') { ADM.msg = `Cleared ${ADM.ghosts} ghosts.`; ADM.ghosts = 0; }
   else if (a === 'addPoints') ADM.msg = 'Added 100 Halloween points to you.';
@@ -50,6 +53,7 @@ function mock(name, data) {
     return Promise.resolve(res);
   }
   if (name === 'adminDo') return Promise.resolve(mockAdmin(data));
+  if (name === 'waypoint') { const a = (state.world[data.holiday] || []).find(x => x.key === data.key); return Promise.resolve({ ok: !!a, msg: a ? `Waypoint set: ${a.title} (1.4 km)` : 'Nothing to point at.' }); }
   return Promise.resolve({});
 }
 
@@ -113,7 +117,18 @@ if (!inGame) {
     s.active = [{ ...s.active[0], id: 'columbus', label: L.columbus, blurb: B.columbus, theme: { a: T.columbus[0], b: T.columbus[1] } }, hw];
     s.events = { columbus: { id: 'columbus', ...PVE.columbus }, halloween: { id: 'halloween', ...PVE.halloween } }; s.event = s.events.columbus;
   }
+  if (PV.has('games')) { if (!s.events) s.events = s.event ? { [id]: s.event } : {}; } // the old in-menu mini games (Config.MenuGames = true)
+  else { // default: the city hub, with made-up progress over the real activity list from config_world.lua
+    const fake = (list) => (list || []).map((a, i) => a.type === 'gathering'
+      ? { ...a, today: 0, startsIn: 3 * 3600 + 1240 }
+      : { ...a, today: i === 0 ? Math.max(1, Math.floor(a.cap / 2)) : i === 1 && a.type === 'delivery' ? 1 : 0, job: a.type === 'delivery' ? { drop: 3, left: 412 } : undefined });
+    s.world = {}; for (const x of s.active) if (PREVIEW_WORLD[x.id]) s.world[x.id] = fake(PREVIEW_WORLD[x.id]);
+    const hw = PVE.halloween;
+    if (s.active.some(x => x.id === 'halloween')) s.contest = { halloween: { board: hw.contest, ghosts: hw.world } };
+    delete s.events; s.event = null;
+  }
 
+  ADM.world = ADM.holidays.filter(x => PREVIEW_WORLD[x.id]).map(x => ({ id: x.id, label: x.label, live: x.forced, activities: PREVIEW_WORLD[x.id].map(a => ({ key: a.key, title: a.title, type: a.type, count: a.total || 2, at: a.at })) }));
   if (PV.has('admin')) {
     Object.assign(ADM.holidays.find(h => h.id === 'halloween'), { forced: true });
     Object.assign(ADM.holidays.find(h => h.id === 'mlk'), { enabled: false });

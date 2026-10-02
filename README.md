@@ -1,84 +1,92 @@
 # s2-holidays
 
-Calendar-driven US holidays for Qbox servers, with a modern dark dashboard UI, a wood-and-glass advent calendar,
-a different experience for each major holiday, a month-long Halloween contest with ghosts out in the city,
-and an admin tablet for testing.
+Calendar-driven US holidays for Qbox servers. Every holiday brings **activities out in the city**: things to find,
+places to go, jobs to run and live events to show up for. A modern menu (`/holidays`) works as the hub: what is on
+today, your progress, countdowns, and a waypoint to the nearest spot. Admins get a tablet for testing.
 
-| Holiday | Experience |
+## What happens in the city
+
+| Holiday | In the city |
 |---|---|
-| Christmas | Advent calendar (wood or holo skin), claim a drawer each day by playing |
-| Halloween | All of October: trick or treating at real front doors across the city, ghosts you trap with a flashlight, a live leaderboard, and prizes for the top three |
-| Valentine's Day | Secret admirer envelopes |
-| Easter | Egg hunt |
-| St. Patrick's Day | Pot of gold clover patch |
-| Independence Day | Fireworks launch pads |
-| Thanksgiving | Feast table that fills as you play |
-| New Year's Eve | Ball-drop countdown |
-| New Year's Day | Resolution cards |
-| Memorial Day, Veterans Day | Candle vigil with a city-wide count |
-| Martin Luther King Jr. Day | Pledge wall: sign the day-of-service pledge and see everyone else's signature (volunteer lunch reward) |
-| Presidents' Day | Presidential Mint: flip coins on velvet for silver dollars, collector sets or a rare gold coin |
-| Mother's Day | Bouquet for Mom: pick flowers in the garden, from roses to a rare orchid |
-| Juneteenth | Freedom Day cookout: dishes unlock as you play on a gingham picnic spread, then raise a glass |
-| Father's Day | Grill Master: lift the lids for perfect burgers, prime steak or the golden spatula |
-| Labor Day | Punch the Clock: a paper time card, one punch per shift as you play, then payday |
-| Columbus / Indigenous Peoples' Day | Explore the Coast: dig the marked spots on the beach for sea glass, old maps or a sunken chest |
+| New Year's Day | **Polar plunge** at any beach (get in the water), **Resolution run** checkpoints through the parks |
+| Martin Luther King Jr. Day | **Day of service**: clean up litter in the parks, plant trees in the **Community garden** |
+| Valentine's Day | **Rose delivery** from the flower stalls to doors around town (timed), **Secret admirer letters** hidden at romantic lookouts |
+| Presidents' Day | **Presidential coin hunt** near government buildings, **Presidents' Day sale** vouchers at the dealerships |
+| St. Patrick's Day | **Pots of gold** in the hills, **Pub crawl** across every bar in the county |
+| Easter | **City egg hunt** (glowing eggs in the parks, search areas on the map), **Easter baskets** delivered to families |
+| Mother's Day | **Bouquet for Mom** delivery, **Wildflowers** to pick in the parks |
+| Memorial Day | **Lay a wreath** at the memorials, **National moment of remembrance** at Legion Square at 3 pm |
+| Juneteenth | **Freedom Day cookout** at grills in the parks, **Freedom celebration** with fireworks over Legion Square at 8 pm |
+| Father's Day | **Grill master** at backyard grills, **Fishing with Dad** off any pier |
+| Independence Day | **Launch the fireworks** from beach pads (everyone nearby sees them), **Fireworks over the pier** show at 9 pm |
+| Labor Day | **Holiday shifts** at construction sites, **Haul supplies** from stores to work sites |
+| Columbus / Indigenous Peoples' Day | **Beachcombing** for sea glass, maps and sunken chests, **Coastal lookouts** |
+| Halloween | **Trick or treat** at front doors all over the map, **Ghost hunt** with a flashlight at night, month-long leaderboard and prizes |
+| Veterans Day | **Salute at the memorials**, **Care packages** delivered to veterans |
+| Thanksgiving | **Food drive** deliveries to families, **Turkey trot** checkpoints |
+| Christmas | **Present hunt** around the city, **Caroling** at doors, plus the advent calendar in the menu |
+| New Year's Eve | **Midnight countdown** at Legion Square with a fireworks show, **Party supplies** runs |
 
-Every holiday on the calendar has its own activity, scene art, emblem and colors. When two run at once (Columbus Day falls
-inside the Halloween month) the menu opens on the one whose day it is and a "Happening now" switcher flips between them. Every roll, limit and reward is decided on the server.
+Three kinds of activity, all configured in `config_world.lua`:
+- **Spots**: go somewhere and interact (a prop, a door, a station). Each spot once a day, with a daily cap. Props are spawned
+  only on your own client near you; markers, lights and map blips (exact spots or search areas) are configurable.
+- **Deliveries**: pick something up, carry it (box in hand, GPS route on the map) and drop it off before the timer runs out.
+- **Gatherings**: be inside the circle on the map at the set time (server clock). Everyone there is rewarded, the server
+  announces it ahead of time, and fireworks shows play for everyone in range.
+
+The server decides everything: what is running, whether you are really at the spot (2D distance check), daily caps, rolls
+and payouts. Rewards are configurable per activity; Halloween activities also score contest points.
 
 ## Install
 1. Put this folder in your resources as `s2-holidays`.
 2. Dependencies: `ox_lib`, `qbx_core`, `ox_inventory`, `oxmysql`. Tables (`s2_holiday_*`) are created automatically.
 3. `ensure s2-holidays`, then give admins access: `add_ace group.admin s2-holidays.admin allow` (Qbox admins also work).
-4. Edit `config.lua`: holidays and windows, reward items (they must exist in ox_inventory), `Config.Events`, `Config.Ghosts`.
+4. Edit `config.lua` (holidays, dates, themes, Halloween contest, ghosts) and `config_world.lua` (city activities, places, rewards).
+   Reward items must exist in ox_inventory.
 
-Players open the UI with `/holidays` (default key F7). Admins use `/holidayadmin`.
-Players who do not want world ghosts can turn them off with `/halloweenghosts`. Admins can stand outside a front door and run
-`/holidaydoor` to copy a ready-to-paste trick-or-treat door line for `config.lua`.
+Remove the old `smokey-holidays` resource from `server.cfg`; this replaces it and does not read its table.
 
-This replaces the old `smokey-holidays` resource completely. It does not read the old `smokey_holiday_leaderboard`
-table, so remove the old resource from `server.cfg` before starting this one.
+## Commands
+| Command | Who | What |
+|---|---|---|
+| `/holidays` (F7) | Players | The city hub: today's activities, progress, waypoints, Halloween leaderboard, advent calendar |
+| `/holidaycancel` | Players | Drop the delivery you are carrying |
+| `/halloweenghosts` | Players | Opt out of (or back into) world ghosts |
+| `/holidayadmin` | Admins | The admin tablet |
+| `/holidayspot` | Anyone | Copies a `vec3(...)` for where you stand, for adding or fixing positions |
 
-## Halloween contest
-Runs Oct 1 to Oct 31. Players score points three ways:
-- **Trick or treating around the city.** Front doors across Los Santos are marked with blips. Walk up, press E, knock, and
-  get a treat, a trick (jump scare) or nothing. Each door once a night, up to 15 doors a night (`Config.TrickOrTreat`).
-- **Ghost hunting.** Ghosts appear near players at night. They are faint until lit, and can only be caught with a flashlight
-  (`WEAPON_FLASHLIGHT`): aim at the ghost and hold the beam on it until the meter fills. The server checks the flashlight
-  is in hand. Turn this off with `Config.Ghosts.flashlight.required = false`.
-- **The holiday menu.** Five houses on the menu's street each night, plus a ghost that drifts across the dark sky: sweep the
-  cursor (your flashlight) over it and hold it there to trap it.
-
-The menu shows your score, rank, doors and ghosts, and the sidebar shows the leaderboard. At midnight after Oct 31 the board locks, the winner is announced to everyone, and the top three can claim their prize from the
-holiday menu until Nov 7. Points, prizes, caps and ghost spawning rules are all in `config.lua`.
+## Before going live
+- **Walk the positions.** Places in `config_world.lua` are a starting set from the map and may be a few metres off (props
+  and markers snap to the ground, and the server checks distance in 2D, so small errors are fine). Use the tablet's
+  **City activities** tab: **Go there** teleports you through every spot of an activity; fix any with `/holidayspot`.
+- **Prop models.** Each activity can spawn a prop (`prop_bbq_1`, `prop_money_bag_01`, `ind_prop_firework_01` and so on). If a
+  model does not exist on your server the activity falls back to its marker. Swap in your own props freely.
+- **Flashlights.** Players need `WEAPON_FLASHLIGHT` to catch Halloween ghosts.
+- **Menu mini games.** The earlier in-menu games are still there: set `Config.MenuGames = true` to use them instead of the hub.
 
 ## Admin tablet
-`/holidayadmin` opens a tablet with four tabs: Overview, Holidays, Time travel and Halloween. Toggle any holiday on or
-off (saved), force one active until restart, override the date, run a fake clock (drives the New Year's Eve countdown and the contest close), reset your claims, add playtime, and switch the advent calendar.
-Halloween tools: spawn a ghost near you, clear all ghosts, give yourself 100 points, and reset the contest (asks
-twice). Date, clock and forced holidays reset on restart.
+Tabs: Overview, Holidays (enable, force on, reset your claims), **City activities** (go to every spot, start a gathering now,
+reset your city progress), Time travel (fake date and clock, which also drive gatherings), and Halloween (ghosts, points,
+contest reset).
 
-Test the contest end to end: force Halloween on, spawn a ghost and catch it, add points to a few characters, set the
-date to Oct 31 and the fake time to 23:59:30, then watch the board close and claim the prize.
+Test a holiday end to end: force it on in the Holidays tab, open `/holidays`, use **Set waypoint** and do an activity; for
+gatherings, set the fake clock a minute before the start time and stand in the circle.
+
+## Halloween contest
+Runs all October: knock on doors and trap ghosts with your flashlight to score points. The board locks at midnight after
+Oct 31, the winner is announced to everyone, and the top three claim prizes from the menu until Nov 7.
 
 ## Develop and preview without the game
 ```
 pip install -r dev/requirements.txt && playwright install chromium
 python dev/smoke.py          # click-through tests
 python dev/shot.py           # screenshots in web/screenshots/
+lua5.4 dev/dates_test.lua    # date rules
+lua5.4 dev/export_world.lua  # regenerate the preview's activity list after editing config_world.lua
 ```
-Open `web/index.html?holiday=halloween` (or any holiday id, `&closed` for the contest results, `?admin` for the admin
-tablet) in a browser. The art is original SVG and is regenerated by `python dev/art.py`.
-
-## Working with Claude Code
-`CLAUDE.md` gives Claude Code the architecture, rules and commands. Project skills: `/preview [id]`, `/smoke-test`.
-See https://code.claude.com/docs/en/claude-directory.
-
-## Players need
-- A flashlight (`WEAPON_FLASHLIGHT` in ox_inventory) to catch world ghosts. Sell it somewhere or hand it out for October.
-- Door positions in `config.lua` are a starting set. Walk them once on your server and fix any that are off with `/holidaydoor`.
+Open `web/index.html?holiday=<id>` in a browser (`&closed` for contest results, `&games` for the old mini games, `?admin` for
+the tablet). The art is original SVG, regenerated by `python dev/art.py`.
 
 ## Status
-The UI is tested through the browser preview and a mock server, and the date rules through a Lua 5.4 test. The game
-side (ghost peds, notifications, payouts) has not been run in-game yet. Run it on a test server before going live.
+The UI is tested in the browser preview with a mock server; the date rules with Lua 5.4. The game side (props, blips,
+deliveries, gatherings, fireworks, payouts) has not been run in-game yet. Run it on a test server before going live.

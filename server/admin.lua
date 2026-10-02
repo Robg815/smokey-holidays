@@ -80,8 +80,20 @@ local function build()
         clock = s and ('%02d:%02d:%02d'):format(s // 3600, s % 3600 // 60, s % 60) or nil,
         advent = Config.Advent and Config.Advent.enabled == true, holidays = list,
         ghosts = Ghosts and Ghosts.count or 0, ghostMax = Config.Ghosts and Config.Ghosts.maxActive or 0,
-        doors = Config.TrickOrTreat and Config.TrickOrTreat.enabled and #Config.TrickOrTreat.doors or 0,
+        doors = Config.Places and #Config.Places.houses or 0,
         flashlight = Config.Ghosts and Config.Ghosts.flashlight and Config.Ghosts.flashlight.required == true,
+        world = (function()
+            local out = {}
+            for _, h in ipairs(Config.Holidays) do
+                local acts = {}
+                for _, a in ipairs((Config.World or {})[h.id] or {}) do
+                    local n = a.type == 'spots' and #World.places(a.spots) or a.type == 'delivery' and #World.places(a.pickups) or 1
+                    acts[#acts + 1] = { key = a.key, title = a.title, type = a.type, count = n, at = a.at }
+                end
+                if #acts > 0 then out[#out + 1] = { id = h.id, label = h.label, live = natural[h.id] == true or Admin.forced[h.id] == true, activities = acts } end
+            end
+            return out
+        end)(),
     }
 end
 
@@ -179,8 +191,37 @@ function actions.resetContest()
     local y = Dates.today()
     local a = MySQL.update.await('DELETE FROM s2_holiday_points WHERE event = ? AND year = ?', { 'halloween', y }) or 0
     MySQL.update.await('DELETE FROM s2_holiday_winners WHERE event = ? AND year = ?', { 'halloween', y })
-    MySQL.update.await('DELETE FROM s2_holiday_claims WHERE event IN (?, ?) AND year = ?', { 'halloween_ghost', 'halloween_door', y })
+    MySQL.update.await('DELETE FROM s2_holiday_claims WHERE event IN (?, ?) AND year = ?', { 'halloween_ghost', 'w_halloween_doors', y })
     return ('Halloween contest reset (%d scores removed).'):format(a)
+end
+
+-- City tab: go to the next spot of an activity (cycles), start a gathering now, reset your own city progress
+function actions.teleport(src, d)
+    local a = World.find(d.id, d.key)
+    if not a then return 'Unknown activity.' end
+    local list = a.type == 'spots' and World.places(a.spots) or a.type == 'delivery' and World.places(a.pickups) or { a.center }
+    if #list == 0 then return 'No positions configured.' end
+    local k = d.id .. ':' .. d.key .. ':' .. src
+    local i = (World.tp[k] or 0) % #list + 1
+    World.tp[k] = i
+    local c = list[i]
+    SetEntityCoords(GetPlayerPed(src), c.x, c.y, c.z + 1.0, false, false, false, false)
+    return ('Teleported to %s, %d of %d.'):format(a.title, i, #list)
+end
+
+function actions.gather(_, d)
+    local a = World.find(d.id, d.key)
+    if not a or a.type ~= 'gathering' then return 'Not a gathering.' end
+    return ('%s started: %d players rewarded.'):format(a.title, World.fire(d.id, a))
+end
+
+function actions.resetCity(src)
+    local p = exports.qbx_core:GetPlayer(src)
+    if not p then return 'Nothing to reset.' end
+    local n = MySQL.update.await("DELETE FROM s2_holiday_claims WHERE citizenid = ? AND year = ? AND LEFT(event, 2) = 'w_'", { p.PlayerData.citizenid, (Dates.today()) })
+    World.delivering[p.PlayerData.citizenid] = nil
+    TriggerClientEvent('s2-holidays:world:resync', src)
+    return ('Removed %d of your city activity claims.'):format(n or 0)
 end
 
 lib.callback.register('s2-holidays:admin:get', function(src)
@@ -192,6 +233,7 @@ lib.callback.register('s2-holidays:admin:do', function(src, action, data)
     if not isAdmin(src) or type(data) ~= 'table' then return nil end
     local fn = actions[action]
     local msg = fn and fn(src, data) or 'Unknown action.'
+    if action == 'date' or action == 'force' or action == 'toggle' then TriggerClientEvent('s2-holidays:world:resync', -1) end -- running holidays changed
     print(('[s2-holidays] admin %s (%s) -> %s'):format(GetPlayerName(src) or src, tostring(action), msg))
     local out = build()
     out.msg = msg

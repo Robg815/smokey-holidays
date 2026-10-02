@@ -9,9 +9,9 @@ author 'Smokey'
 
 ui_page 'web/index.html'
 
-shared_scripts { '@ox_lib/init.lua', 'config.lua' }
-client_scripts { 'client/main.lua', 'client/events.lua', 'client/admin.lua', 'client/ghosts.lua', 'client/trickortreat.lua' }
-server_scripts { '@oxmysql/lib/MySQL.lua', 'server/dates.lua', 'server/admin.lua', 'server/events.lua', 'server/ghosts.lua', 'server/trickortreat.lua', 'server/main.lua' }
+shared_scripts { '@ox_lib/init.lua', 'config.lua', 'config_world.lua' }
+client_scripts { 'client/main.lua', 'client/events.lua', 'client/admin.lua', 'client/ghosts.lua', 'client/world.lua' }
+server_scripts { '@oxmysql/lib/MySQL.lua', 'server/dates.lua', 'server/admin.lua', 'server/events.lua', 'server/ghosts.lua', 'server/world.lua', 'server/main.lua' }
 
 files { 'web/index.html', 'web/css/*.css', 'web/js/*.js', 'web/img/*.svg', 'web/img/**/*.svg' }
 

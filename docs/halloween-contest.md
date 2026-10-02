@@ -70,8 +70,8 @@ Everything below is implemented. The Lua has not been run in-game yet; use the t
 - [x] Flashlight catching: `Config.Ghosts.flashlight`. The ghost is faint until lit; the client fills an exposure meter while the
       beam is on it (flashlight in hand, switched on or aimed, within `range` and `cone`, clear line of sight) and calls catch at full.
       The server also requires the flashlight to be the selected weapon and the ghost to be at least `exposure` seconds old.
-- [x] City trick or treat: `Config.TrickOrTreat` doors, `s2-holidays:door:knock` / `s2-holidays:door:state`, claims under
-      `halloween_door` (slot `toDays*1000 + index`), nightly cap, same outcomes and points as the menu houses. `state.event.doors = { today, cap, total }`.
+- [x] City trick or treat: now the `doors` activity in `Config.World.halloween` (config_world.lua), run by server/world.lua;
+      claims under `w_halloween_doors`, nightly cap, same outcomes and points as the menu houses.
 - [x] UI: the menu's street is dark and the cursor is a flashlight; ghosts are trapped by holding the beam on them.
 
 ## Contracts

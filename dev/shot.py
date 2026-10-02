@@ -27,7 +27,7 @@ def main():
         beam = lambda: (pg.mouse.move(1180, 560), pg.wait_for_timeout(150))  # sweep the flashlight into the sky for the Halloween shot
         for i in (want or IDS): shot(f'?holiday={i}&art', i, act=beam if i == 'halloween' else None)
         if not want:
-            shot('?holiday=halloween&force=trick', 'halloween_scare', 1900, lambda: (pg.click('.spot:not([disabled])'), pg.wait_for_timeout(260)))
+            shot('?holiday=halloween&force=trick&games', 'halloween_scare', 1900, lambda: (pg.click('.spot:not([disabled])'), pg.wait_for_timeout(260)))
             shot('?holiday=christmas&skin=holo&art', 'holo')
             shot('?holiday=halloween&closed', 'halloween_closed')
             shot('?admin', 'admin', 600)

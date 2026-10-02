@@ -3,7 +3,7 @@
 const adminEl = $('#admin');
 const KIND_LABEL = { advent: 'Advent calendar', spots: 'Pick and reveal', feast: 'Feast table', 'feast:cookout': 'Cookout', 'feast:timecard': 'Time card', countdown: 'Countdown',
   tribute: 'Candle vigil', 'tribute:pledge': 'Pledge wall', observance: 'Observance card' };
-const TABS = [['overview', 'Overview', 'rank'], ['holidays', 'Holidays', 'calendar'], ['time', 'Time travel', 'clock'], ['halloween', 'Halloween', 'ghost']];
+const TABS = [['overview', 'Overview', 'rank'], ['holidays', 'Holidays', 'calendar'], ['city', 'City activities', 'pin'], ['time', 'Time travel', 'clock'], ['halloween', 'Halloween', 'ghost']];
 let admTab = 'overview', admData = null;
 
 const adminOpen = () => !adminEl.classList.contains('off');
@@ -74,7 +74,18 @@ function tabHalloween(d) {
         <p class="hint">Reset removes every score, winner, ghost catch and door knock for this year. It asks twice.</p></section>
     </div>`;
 }
-const TAB_FN = { overview: tabOverview, holidays: tabHolidays, time: tabTime, halloween: tabHalloween };
+const CITY_TYPE = { spots: 'spots', delivery: 'pickups', gathering: '' };
+function tabCity(d) { // every holiday's city activities, with a way to check each position in game
+  const row = (h, a) => `<div class="crow"><span class="ci">${icon(a.type === 'gathering' ? 'users' : a.type === 'delivery' ? 'box' : 'pin')}</span>
+    <div class="cn"><b>${esc(a.title)}</b><span>${a.type === 'gathering' ? `Live event at ${esc(a.at)}` : `${a.count} ${CITY_TYPE[a.type]}`}</span></div>
+    ${a.type === 'gathering' ? `<button data-a="gather" data-id="${esc(h.id)}" data-key="${esc(a.key)}">${icon('firework')}Start now</button>` : ''}
+    <button data-a="tp" data-id="${esc(h.id)}" data-key="${esc(a.key)}">${icon('pin')}Go there</button></div>`;
+  return `<section class="pane"><h3>Check positions in game</h3><p class="muted">Go there teleports you to the next spot of an activity (it cycles). If a spot is off, stand where it should be and run /holidayspot, then paste the line into config_world.lua.</p>
+      <div class="qa"><button data-a="resetCity">${icon('trash')}Reset my city progress</button></div></section>
+    ${(d.world || []).map(h => `<section class="pane cityh"><div class="li"><img src="${emblemSrc(h.id)}" alt=""><span><b>${esc(h.label)}</b></span>${h.live ? '<em class="tag live">Running</em>' : ''}</div>
+      ${h.activities.map(a => row(h, a)).join('')}</section>`).join('')}`;
+}
+const TAB_FN = { overview: tabOverview, holidays: tabHolidays, city: tabCity, time: tabTime, halloween: tabHalloween };
 
 function renderAdmin(d) {
   admData = d;
@@ -111,7 +122,9 @@ adminEl.addEventListener('click', (e) => {
   else if (a === 'clockReset') adminDo('clock', {});
   else if (a === 'reset') adminDo('resetClaims', { id: b.dataset.id });
   else if (a === 'minutes') adminDo('playtime', { minutes: 30 });
-  else if (a === 'spawnGhost' || a === 'clearGhosts') adminDo(a);
+  else if (a === 'spawnGhost' || a === 'clearGhosts' || a === 'resetCity') adminDo(a);
+  else if (a === 'tp') adminDo('teleport', { id: b.dataset.id, key: b.dataset.key });
+  else if (a === 'gather') adminDo('gather', { id: b.dataset.id, key: b.dataset.key });
   else if (a === 'addPoints') adminDo('addPoints', { points: 100 });
   else if (a === 'resetContest') { // two-step confirm: wipes this year's board, winners, ghost catches and door knocks for everyone
     if (b.dataset.armed) adminDo('resetContest');

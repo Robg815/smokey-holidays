@@ -21,10 +21,13 @@ server/ghosts.lua  world ghosts: spawn loop, caps, server-verified catch (calls 
 server/main.lua    state callback, advent claims, playtime thread
 client/main.lua    opens the UI (/holidays + keybind), `claim` + `close` NUI callbacks, login notify
 client/ghosts.lua  local ghost ped, haunt loop, flashlight beam exposure meter (or E when flashlights are off), /halloweenghosts
-server/trickortreat.lua  city-wide door knocking (Config.TrickOrTreat): verify, roll, pay, score
-client/trickortreat.lua  door prompts, blips, knock animation, /holidaydoor (prints a config line for where you stand)
+config_world.lua   Config.Places (shared position lists) + Config.World (every holiday's city activities: spots, delivery, gathering)
+server/world.lua   city activities: verify position (2D), daily caps, rolls, payouts, contest points, deliveries, gatherings, fireworks
+client/world.lua   props/markers/blips/prompts, delivery carry + route, gathering countdown, fireworks FX, `waypoint` NUI callback, /holidayspot
 client/events.lua  `play` NUI callback          client/admin.lua  /holidayadmin + admin NUI callbacks
-web/index.html     one shell; css/{base,advent,events,admin}.css; js/{core,advent,events,admin,preview}.js
+web/index.html     one shell; css/{base,advent,events,admin}.css; js/{core,advent,events,hub,admin,preview}.js
+  js/hub.js renders the city hub (default); js/events.js holds the old in-menu games (Config.MenuGames = true)
+  js/preview-world.js is GENERATED from config_world.lua by `lua5.4 dev/export_world.lua` (smoke.py checks it)
 web/img/<id>/{emblem,scene}.svg   per-holiday art;  web/img/door*.svg advent door art;  web/img/default/ shared emblem
 dev/               art.py (regenerates the SVG art), shot.py (screenshots), smoke.py (click-through test)
 docs/halloween-contest.md   spec and contracts for the month-long Halloween contest (implemented)
@@ -38,15 +41,19 @@ python dev/shot.py [id ...]      # PNGs in web/screenshots/ (no args = everythin
 python dev/art.py                # regenerate SVG scenes/emblems (deterministic)
 node --check web/js/*.js         # quick syntax check
 lua5.4 dev/dates_test.lua        # date rules (Easter, nth/last weekday, observed days, windows)
+lua5.4 dev/export_world.lua      # regenerate web/js/preview-world.js after editing config_world.lua
 ```
 Browser preview: open `web/index.html?holiday=<id>` (christmas, halloween, valentines, easter, stpatricks, independence,
 thanksgiving, new_years_eve, new_years, memorial, veterans, mlk, presidents, mothers_day, juneteenth, fathers_day, labor, columbus). Extras: `&force=trick`, `&closed` (contest results), `&art`, `&skin=holo`, `?admin`.
 Skills: `/preview [id]`, `/smoke-test`.
 
 ## How it fits together
+- The holidays happen in the city. The menu is a hub (`renderHub`): activity cards with progress, status, countdowns and a
+  Set waypoint button (NUI `waypoint` -> client/world.lua picks the nearest unfinished spot). Don't add new in-menu games.
 - Lua to NUI messages: `open{state}`, `refresh{state}`, `close`, `admin{data}`, `adminHide`.
   NUI to Lua callbacks: `claim`, `play`, `close`, `adminDo`, `adminClose`, `adminPreview`.
-- `getState` returns `{date, theme, active[], upcoming[], advent?, event?, events{id: event}}`. `events` holds every active holiday's
+- `getState` returns `{date, theme, active[], upcoming[], advent?, world{id: progress[]}, contest{id: {board, ghosts}}}`; with
+  Config.MenuGames also `event` and `events{id: event}`. `events` holds every active holiday's
   experience; when two overlap (Columbus Day inside Halloween) the UI shows a "Happening now" switcher and keeps the pick in `state.sel`. `render()` in `core.js` dispatches:
   `advent` to `renderAdvent`, otherwise `EXPERIENCES[event.kind]`, otherwise the observance card.
 - Experience kinds: `advent`, `spots` (pick-and-reveal), `feast`, `countdown`, `tribute`. `style` reskins a kind:
@@ -59,7 +66,7 @@ Skills: `/preview [id]`, `/smoke-test`.
 - `s2_holiday_claims(citizenid, event, year, slot)` unique per slot, inserted with `INSERT IGNORE` so claims are idempotent.
   Slot encodings: advent = day; spots = `toDays*100 + spot*10 + outcomeIndex` (spot 9 = UI ghost catch, slot `+99`);
   feast = dish 1..6, finale 7; tribute = `toDays`; world ghosts use event key `halloween_ghost`, slot `toDays*100 + n`;
-  city doors use `halloween_door`, slot `toDays*1000 + doorIndex`.
+  city activities use `w_<holiday>_<key>` (<= 32 chars), slot `toDays*1000 + spotIndex` (spots), `+ n` (deliveries), `+ 0` (gatherings).
 - `s2_holiday_playtime(citizenid, day, minutes)`; `s2_holiday_points(citizenid, event, year, points, name, updated)`;
   `s2_holiday_winners(event, year, place, citizenid, name, points, claimed)`.
 - `play` arg meanings for spots events: `1..spots` open a spot, `9` UI ghost, `8` claim contest prize. Feast: `1..6` dish, `7` finale.
@@ -87,5 +94,5 @@ observances (so Halloween keeps the headline on Columbus Day). Quick check: `lua
 ## Status
 Done: advent (wood + holo), 11 holiday experiences, per-holiday SVG art, admin panel, event engine, smoke tests,
 date rules, client UI bridge, month-long Halloween contest (leaderboard, podium, prize claim), world ghosts caught with
-flashlights, city-wide trick or treating, modern dashboard UI, tablet admin panel.
+flashlights, 35 city activities across all 18 holidays (config_world.lua), city hub menu, tablet admin panel with a City tab.
 Not yet run in-game. Read `docs/halloween-contest.md` before touching Halloween. Update this section when status changes.

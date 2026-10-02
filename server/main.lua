@@ -68,12 +68,19 @@ lib.callback.register('s2-holidays:getState', function(src)
         end
         state.advent = { skin = ADV.skin, layout = ADV.layout, current = st.current, days = ADV.days, minutes = minutes, doors = doors }
     end
-    -- Every active holiday with an activity, so players can switch when two overlap (Columbus Day inside Halloween)
-    state.events = {}
+    -- City activities (the default) and contest boards for every running holiday
+    state.world, state.contest = World.state(src), {}
     for _, h in ipairs(active) do
-        if Config.Events and Config.Events[h.id] then state.events[h.id] = Events.state(src, h, y, m, d) end
+        local c, ghosts = Events.contest(src, h.id, y, m, d)
+        if c then state.contest[h.id] = { board = c, ghosts = ghosts } end
     end
-    if not state.advent and active[1] then state.event = state.events[active[1].id] end
+    if Config.MenuGames then -- the old in-menu mini games, one per running holiday, switchable when two overlap
+        state.events = {}
+        for _, h in ipairs(active) do
+            if Config.Events and Config.Events[h.id] then state.events[h.id] = Events.state(src, h, y, m, d) end
+        end
+        if not state.advent and active[1] then state.event = state.events[active[1].id] end
+    end
     return state
 end)
 

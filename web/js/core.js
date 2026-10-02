@@ -41,6 +41,20 @@ const ICON = {
   compass: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
   pen: '<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5zM13.5 7l3 3M4 20h16"/>',
   hardhat: '<path d="M4 16a8 8 0 0116 0M3 16h18v3H3zM10 8.3V12M14 8.3V12"/>',
+  wave: '<path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 19.5c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M12 10V3l4 3"/>',
+  run: '<circle cx="15" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 11l4-3 4 1 2 4 3 1M11 15l-1-5"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/>',
+  heart: '<path d="M12 20s-8-5-8-10.5A4.5 4.5 0 0112 7a4.5 4.5 0 018 2.5C20 15 12 20 12 20z"/>',
+  mail: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/>',
+  car: '<path d="M4 16v-4l2-5h12l2 5v4M4 16h16v3H4zM7.5 16h.01M16.5 16h.01M5 12h14"/>',
+  beer: '<path d="M6 8h10v12H6zM16 11h2.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5H16M6 8c0-2 1.5-3 3-3 .5-1.5 4-1.5 4.5 0 1.5 0 2.5 1 2.5 3M9.5 11v6M12.5 11v6"/>',
+  egg: '<path d="M12 21c-4 0-6.5-3-6.5-7S8 3 12 3s6.5 7 6.5 11-2.5 7-6.5 7z"/><path d="M6 13l2.5-1.5L11 13l2.5-1.5L16 13l2-1"/>',
+  firework: '<path d="M12 14v8M12 14l-1-6M12 14l4-5M12 14l-5-3M12 14l6 0M8 4l.5 2M17 5l-1 1.5M4 9l2 .5M20 10l-2 .5M12 2v2"/>',
+  box: '<path d="M3 7.5l9-4.5 9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9M7.5 5.2l9 4.5"/>',
+  binoculars: '<circle cx="6.5" cy="16" r="3.5"/><circle cx="17.5" cy="16" r="3.5"/><path d="M10 15h4M5 12.5L7 5h3v8M19 12.5L17 5h-3v8"/>',
+  flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  fish: '<path d="M3 12c3-5 9-6 13-3l5-3v12l-5-3c-4 3-10 2-13-3z"/><path d="M8.5 11h.01"/>',
   grill: '<path d="M4 10h16a8 8 0 01-16 0zM8 17.5L6 21M16 17.5l2 3.5M12 18v3M9 3c-1 1.5 1 2.5 0 4M13 3c-1 1.5 1 2.5 0 4"/>',
 };
 const icon = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ICON.star}</svg>`;
@@ -85,8 +99,11 @@ function dateBadge(iso) {
 /* The holiday on screen: the one the player picked in "Happening now", else the headline holiday */
 const current = (s) => (s.sel && s.active.find(x => x.id === s.sel)) || s.active[0] || s.upcoming[0];
 
+const hubMode = (s) => !s.events; // the server sends `events` only when Config.MenuGames is on
 function renderNow(s, h) { // switcher shown when more than one holiday is running at once
-  const el = $('#now'), live = s.active.filter(x => x.id === 'christmas' ? s.advent : s.events ? s.events[x.id] : s.event && s.event.id === x.id);
+  const has = (x) => hubMode(s) ? (s.world && s.world[x.id]) || (s.contest && s.contest[x.id]) || (x.id === 'christmas' && s.advent)
+    : x.id === 'christmas' ? s.advent : s.events[x.id];
+  const el = $('#now'), live = s.active.filter(has);
   el.hidden = live.length < 2; if (el.hidden) return;
   el.innerHTML = `<h2>Happening now</h2><div class="sw-list">${live.map(x => `<button class="pick${x.id === h.id ? ' on' : ''}" data-sel="${esc(x.id)}"><img src="${emblemSrc(x.id)}" alt=""><span>${esc(x.label)}</span></button>`).join('')}</div>`;
 }
@@ -99,7 +116,8 @@ function render(s) {
   state = s;
   const h = current(s);
   theme((h && h.theme) || s.theme);
-  if (s.events && h) s.event = s.events[h.id] || null; // the experience that matches the holiday on screen
+  const hub = hubMode(s);
+  if (hub) s.event = null; else if (h) s.event = s.events[h.id] || null; // the experience that matches the holiday on screen
   $('#title').textContent = h ? h.label : 'No holidays scheduled';
   $('#blurb').textContent = h ? h.blurb || '' : '';
   $('#countdown').textContent = h ? when(h.daysUntil) : '';
@@ -114,12 +132,15 @@ function render(s) {
     : '<li><span>Nothing else on the calendar.</span></li>';
 
   stopAmbient(); setStats([]); setExtra('');
-  const advent = s.advent && (!h || h.id === 'christmas');
-  const id = advent ? 'christmas' : (s.event && s.event.id) || '';
+  const advent = s.advent && (!h || h.id === 'christmas') && (!hub || s.view === 'advent');
+  const live = h && s.active.includes(h); // a running holiday (not just the next one on the calendar)
+  const id = advent ? 'christmas' : hub ? (live ? h.id : '') : (s.event && s.event.id) || '';
   app.dataset.holiday = id;
   setEmblem(id || (h && h.id) || '');
+  syncBack(hub && advent);
   if (advent) renderAdvent(s.advent);
-  else if (s.event && EXPERIENCES[s.event.kind]) EXPERIENCES[s.event.kind](s.event);
+  else if (hub && live) renderHub(s, h);
+  else if (!hub && s.event && EXPERIENCES[s.event.kind]) EXPERIENCES[s.event.kind](s.event);
   else renderEmpty(s);
 }
 

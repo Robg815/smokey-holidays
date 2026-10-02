@@ -145,14 +145,9 @@ function Events.contestOpen(id)
 end
 Events.nameOf, Events.addPoints = nameOf, addPoints
 
--- Shared building blocks for other server files (city doors). Same rules: roll, check space, claim, pay, score.
+-- Shared building blocks for other server files (server/world.lua). Same rules: roll, check space, claim, pay, score.
 Events.util = { cfgFor = cfgFor, cidOf = cidOf, roll = roll, canCarry = canCarry, give = give, rows = rows, insert = insert, award = award, busy = busy, FULL = FULL }
 
--- City doors knocked today (slot = day * 1000 + door index)
-function Events.doorsToday(cid, y, m, d)
-    local base = Dates.toDays(y, m, d) * 1000
-    return rows(cid, 'halloween_door', y, base, base + 999)
-end
 
 -- A ghost caught out in the world (verified by server/ghosts.lua before this is called)
 function Events.worldCatch(src)
@@ -182,6 +177,31 @@ function Events.worldLeft(src)
     return w.perDay - #rows(cid, 'halloween_ghost', y, base, base + 99)
 end
 
+-- Contest board for a holiday (Halloween): standings, time left, and once closed the winners and this player's prize.
+-- Second value: world ghosts caught today. Used by the city hub and by the in-menu games.
+function Events.contest(src, id, y, m, d)
+    local cfg, cid = cfgFor(id), cidOf(src)
+    if not cfg or not cfg.contest or not cid then return end
+    local left = contestLeft(cfg, y, m, d)
+    local c = standing(cfg, id, y, cid)
+    c.open, c.secondsLeft, c.hint = left > 0, math.max(left, 0), cfg.contest.hint
+    if left <= 0 then
+        finalize(id, cfg, y)
+        c.winners = {}
+        for _, r in ipairs(MySQL.query.await('SELECT place, citizenid, name, points, claimed FROM s2_holiday_winners WHERE event = ? AND year = ? ORDER BY place', { id, y }) or {}) do
+            c.winners[#c.winners + 1] = { place = r.place, name = shown(r.name, cfg.contest.names), points = r.points, you = r.citizenid == cid }
+            if r.citizenid == cid and cfg.contest.prizes[r.place] then c.prize = { place = r.place, label = cfg.contest.prizes[r.place].label, claimed = r.claimed == 1 } end
+        end
+    end
+    local world
+    if cfg.world then
+        local base = Dates.toDays(y, m, d) * 100
+        world = { today = #rows(cid, id .. '_ghost', y, base, base + 99), cap = cfg.world.perDay,
+            flashlight = Config.Ghosts and Config.Ghosts.flashlight and Config.Ghosts.flashlight.required == true }
+    end
+    return c, world
+end
+
 -- What the UI shows when it opens. Spot slots are encoded as day*100 + spot*10 + outcome (spot 9 = ghost catch).
 function Events.state(src, h, y, m, d)
     local cfg, cid = cfgFor(h.id), cidOf(src)
@@ -204,27 +224,8 @@ function Events.state(src, h, y, m, d)
         out.ghost = cfg.ghostCatch ~= nil and not ghostDone
 
         if cfg.contest then
-            local left = contestLeft(cfg, y, m, d)
-            out.contest = standing(cfg, h.id, y, cid)
-            out.contest.open, out.contest.secondsLeft, out.contest.hint = left > 0, math.max(left, 0), cfg.contest.hint
-            if left <= 0 then -- closed: results + prize
-                finalize(h.id, cfg, y)
-                out.used, out.ghost = out.picks, false
-                out.contest.winners = {}
-                for _, r in ipairs(MySQL.query.await('SELECT place, citizenid, name, points, claimed FROM s2_holiday_winners WHERE event = ? AND year = ? ORDER BY place', { h.id, y }) or {}) do
-                    out.contest.winners[#out.contest.winners + 1] = { place = r.place, name = shown(r.name, cfg.contest.names), points = r.points, you = r.citizenid == cid }
-                    if r.citizenid == cid and cfg.contest.prizes[r.place] then out.contest.prize = { place = r.place, label = cfg.contest.prizes[r.place].label, claimed = r.claimed == 1 } end
-                end
-            end
-            if cfg.world then
-                local base = Dates.toDays(y, m, d) * 100
-                out.world = { today = #rows(cid, h.id .. '_ghost', y, base, base + 99), cap = cfg.world.perDay,
-                    flashlight = Config.Ghosts and Config.Ghosts.flashlight and Config.Ghosts.flashlight.required == true }
-            end
-            local tt = Config.TrickOrTreat
-            if h.id == 'halloween' and tt and tt.enabled then
-                out.doors = { today = #Events.doorsToday(cid, y, m, d), cap = tt.perNight, total = #tt.doors }
-            end
+            out.contest, out.world = Events.contest(src, h.id, y, m, d)
+            if not out.contest.open then out.used, out.ghost = out.picks, false end
         end
 
     elseif cfg.kind == 'feast' then
