@@ -6,12 +6,12 @@ chk('epoch', Dates.toDays(1970,1,1) == 0)
 for _, k in ipairs({0, 1, 59, 365, 10957, 20727, -1, 50000}) do local y,m,d = Dates.fromDays(k); chk('roundtrip '..k, Dates.toDays(y,m,d) == k) end
 local function on(s) local y,m,d = s:match('(%d+)-(%d+)-(%d+)'); y,m,d=tonumber(y),tonumber(m),tonumber(d); local a,u = Dates.evaluate(Dates.toDays(y,m,d), y); return a,u end
 local function ids(l) local t={} for _,e in ipairs(l) do t[#t+1]=e.id..'@'..e.date..'('..e.daysUntil..')' end return table.concat(t,' ') end
-local a = on('2026-10-12'); chk('columbus (its day) headlines, halloween still active', a[1].id == 'columbus' and a[2].id == 'halloween')
-local a4 = on('2026-10-20'); chk('halloween headlines over plain observance days', a4[1].id == 'halloween')
+local a = on('2026-10-12'); chk('only halloween is running mid October (no minor holidays)', #a == 1 and a[1].id == 'halloween')
+local a5 = on('2026-12-31'); chk('Dec 31: new year\'s eve headlines, new year\'s day also running', a5[1].id == 'new_years_eve' and a5[2].id == 'new_years')
 chk('easter 2026 = Apr 5', ({on('2026-04-05')})[1][1].date == '2026-04-05')
 chk('thanksgiving 2026 = Nov 26', ({on('2026-11-26')})[1][1].date == '2026-11-26')
 chk('memorial 2026 = May 25', ({on('2026-05-25')})[1][1].date == '2026-05-25')
-chk('MLK 2026 = Jan 19', ({on('2026-01-19')})[1][1].date == '2026-01-19')
+chk('Labor Day 2026 = Sep 7', ({on('2026-09-07')})[1][1].date == '2026-09-07')
 local a2 = on('2026-07-03'); chk('july 4 2026 (sat) active on observed fri', a2[1].id == 'independence')
 local a3 = on('2026-11-08'); chk('halloween over on nov 8', #a3 == 0 or a3[1].id ~= 'halloween')
 local _, u = on('2026-12-29'); chk('upcoming wraps into next year', u[2].id == 'new_years' and u[2].date == '2027-01-01')

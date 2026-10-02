@@ -1,6 +1,7 @@
 # s2-holidays
 
-Calendar-driven US holidays for Qbox servers. Every holiday brings **activities out in the city**: things to find,
+Calendar-driven US holidays for Qbox servers, covering the 11 most widely celebrated: New Year's Eve and Day,
+Valentine's, St. Patrick's, Easter, Memorial Day, Independence Day, Labor Day, Halloween, Thanksgiving and Christmas. Each one brings **activities out in the city**: things to find,
 places to go, jobs to run and live events to show up for. A modern menu (`/holidays`) works as the hub: what is on
 today, your progress, countdowns, and a waypoint to the nearest spot. Admins get a tablet for testing.
 
@@ -9,20 +10,13 @@ today, your progress, countdowns, and a waypoint to the nearest spot. Admins get
 | Holiday | In the city |
 |---|---|
 | New Year's Day | **Polar plunge** at any beach (get in the water), **Resolution run** checkpoints through the parks |
-| Martin Luther King Jr. Day | **Day of service**: clean up litter in the parks, plant trees in the **Community garden** |
 | Valentine's Day | **Rose delivery** from the flower stalls to doors around town (timed), **Secret admirer letters** hidden at romantic lookouts |
-| Presidents' Day | **Presidential coin hunt** near government buildings, **Presidents' Day sale** vouchers at the dealerships |
 | St. Patrick's Day | **Pots of gold** in the hills, **Pub crawl** across every bar in the county |
 | Easter | **City egg hunt** (glowing eggs in the parks, search areas on the map), **Easter baskets** delivered to families |
-| Mother's Day | **Bouquet for Mom** delivery, **Wildflowers** to pick in the parks |
 | Memorial Day | **Lay a wreath** at the memorials, **National moment of remembrance** at Legion Square at 3 pm |
-| Juneteenth | **Freedom Day cookout** at grills in the parks, **Freedom celebration** with fireworks over Legion Square at 8 pm |
-| Father's Day | **Grill master** at backyard grills, **Fishing with Dad** off any pier |
 | Independence Day | **Launch the fireworks** from beach pads (everyone nearby sees them), **Fireworks over the pier** show at 9 pm |
 | Labor Day | **Holiday shifts** at construction sites, **Haul supplies** from stores to work sites |
-| Columbus / Indigenous Peoples' Day | **Beachcombing** for sea glass, maps and sunken chests, **Coastal lookouts** |
 | Halloween | **Trick or treat** at front doors all over the map, **Ghost hunt** with a flashlight at night, month-long leaderboard and prizes |
-| Veterans Day | **Salute at the memorials**, **Care packages** delivered to veterans |
 | Thanksgiving | **Food drive** deliveries to families, **Turkey trot** checkpoints |
 | Christmas | **Present hunt** around the city, **Caroling** at doors, plus the advent calendar in the menu |
 | New Year's Eve | **Midnight countdown** at Legion Square with a fireworks show, **Party supplies** runs |

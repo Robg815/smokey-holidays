@@ -20,7 +20,6 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 /* Line icons (24px grid, stroke = currentColor) used by stat cards, cards and the admin tablet */
 const ICON = {
   ghost: '<path d="M5 21V11a7 7 0 0114 0v10l-2.3-1.6L14.3 21 12 19.4 9.7 21l-2.4-1.6z"/><path d="M9.5 11h.01M14.5 11h.01"/>',
-  candy: '<circle cx="12" cy="12" r="4.2"/><path d="M8.3 9.7L4 7.2 3 11zM15.7 14.3l4.3 2.5 1-3.8M10 10.2l4 3.6"/>',
   house: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10M10 20v-6h4v6"/>',
   trophy: '<path d="M8 4h8v5a4 4 0 01-8 0zM8 6H4.5a3 3 0 003.6 4M16 6h3.5a3 3 0 01-3.6 4M12 13v4M8.5 20h7M10 17h4"/>',
   rank: '<path d="M4 20V13h4v7M10 20V8h4v12M16 20v-9h4v9"/>',
@@ -37,25 +36,17 @@ const ICON = {
   spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>',
   door: '<path d="M5 21V4.5A1.5 1.5 0 016.5 3h11A1.5 1.5 0 0119 4.5V21M3 21h18M15 12h.01"/>',
   coin: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5" stroke-dasharray="1.5 2"/><path d="M12 9.2l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z"/>',
-  flower: '<circle cx="12" cy="9" r="2.2"/><path d="M12 6.8c0-3 3.5-3 3.5-.5M14.2 9c3 0 3 3.5.5 3.5M12 11.2c0 3-3.5 3-3.5.5M9.8 9c-3 0-3-3.5-.5-3.5M12 11.5V21M12 17c-2.5 0-4-1.5-4.5-3.5M12 18.5c2.5 0 4-1.5 4.5-3.5"/>',
-  compass: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
-  pen: '<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5zM13.5 7l3 3M4 20h16"/>',
   hardhat: '<path d="M4 16a8 8 0 0116 0M3 16h18v3H3zM10 8.3V12M14 8.3V12"/>',
   wave: '<path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 19.5c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M12 10V3l4 3"/>',
   run: '<circle cx="15" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 11l4-3 4 1 2 4 3 1M11 15l-1-5"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/>',
   heart: '<path d="M12 20s-8-5-8-10.5A4.5 4.5 0 0112 7a4.5 4.5 0 018 2.5C20 15 12 20 12 20z"/>',
   mail: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/>',
-  car: '<path d="M4 16v-4l2-5h12l2 5v4M4 16h16v3H4zM7.5 16h.01M16.5 16h.01M5 12h14"/>',
   beer: '<path d="M6 8h10v12H6zM16 11h2.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5H16M6 8c0-2 1.5-3 3-3 .5-1.5 4-1.5 4.5 0 1.5 0 2.5 1 2.5 3M9.5 11v6M12.5 11v6"/>',
   egg: '<path d="M12 21c-4 0-6.5-3-6.5-7S8 3 12 3s6.5 7 6.5 11-2.5 7-6.5 7z"/><path d="M6 13l2.5-1.5L11 13l2.5-1.5L16 13l2-1"/>',
   firework: '<path d="M12 14v8M12 14l-1-6M12 14l4-5M12 14l-5-3M12 14l6 0M8 4l.5 2M17 5l-1 1.5M4 9l2 .5M20 10l-2 .5M12 2v2"/>',
   box: '<path d="M3 7.5l9-4.5 9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9M7.5 5.2l9 4.5"/>',
-  binoculars: '<circle cx="6.5" cy="16" r="3.5"/><circle cx="17.5" cy="16" r="3.5"/><path d="M10 15h4M5 12.5L7 5h3v8M19 12.5L17 5h-3v8"/>',
-  flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   music: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
-  fish: '<path d="M3 12c3-5 9-6 13-3l5-3v12l-5-3c-4 3-10 2-13-3z"/><path d="M8.5 11h.01"/>',
-  grill: '<path d="M4 10h16a8 8 0 01-16 0zM8 17.5L6 21M16 17.5l2 3.5M12 18v3M9 3c-1 1.5 1 2.5 0 4M13 3c-1 1.5 1 2.5 0 4"/>',
 };
 const icon = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ICON.star}</svg>`;
 
@@ -72,8 +63,7 @@ function theme(t) {
 
 const EXPERIENCES = {}; // kind -> render(event)
 
-const HAS_ART = new Set(['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'veterans',
-  'mlk', 'presidents', 'mothers_day', 'juneteenth', 'fathers_day', 'labor', 'columbus']); // every holiday now has its own art
+const HAS_ART = new Set(['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'labor']); // every holiday has its own art
 const emblemSrc = (id) => `img/${HAS_ART.has(id) ? id : 'default'}/emblem.svg`; // holidays without custom art share the default badge
 const heroSrc = (id) => HAS_ART.has(id) ? `img/${id}/scene.svg` : 'img/default/hero.svg';
 
@@ -154,9 +144,7 @@ function renderEmpty(s) { // observance days and quiet stretches
 
 /* Reward art by outcome kind (img/rewards/*.svg); anything unknown gets the star */
 const REWARD_ART = { treat: 'candy', trick: 'scare', ghost: 'ghost', empty: 'empty', dud: 'empty', gift: 'gift', basket: 'gift', cash: 'coins', coins: 'coins', egg: 'coins',
-  golden: 'coins', jackpot: 'coins', lucky: 'coins', burst: 'star', finale: 'star', door: 'gift', dish: 'gift', candle: 'star',
-  silver: 'medal', set: 'coins', gold: 'medal', rose: 'bouquet', tulip: 'bouquet', orchid: 'bouquet', weed: 'empty', burger: 'burger', steak: 'burger', burnt: 'empty',
-  glass: 'chest', map: 'chest', chest: 'chest', pledge: 'dove', cookout: 'burger', punch: 'coins' };
+  golden: 'coins', jackpot: 'coins', lucky: 'coins', burst: 'star', finale: 'star', door: 'gift', dish: 'gift', candle: 'star', punch: 'coins' };
 const rewardSrc = (kind) => kind === 'prize' ? 'img/halloween/trophy.svg' : `img/rewards/${REWARD_ART[kind] || 'star'}.svg`;
 
 function reveal({ head, label, sub, kind, points }) {

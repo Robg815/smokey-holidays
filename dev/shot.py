@@ -10,8 +10,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parent.parent
 URL = (ROOT / 'web' / 'index.html').as_uri()
 OUT = ROOT / 'web' / 'screenshots'; OUT.mkdir(exist_ok=True)
-IDS = ['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'veterans',
-       'mlk', 'presidents', 'mothers_day', 'juneteenth', 'fathers_day', 'labor', 'columbus']
+IDS = ['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'labor']
 BG = 'html{background:linear-gradient(160deg,#233246,#0c1420 60%,#1b2733)!important}'  # stand-in for the game world behind the NUI
 
 def main():
@@ -36,7 +35,7 @@ def main():
         b.close()
     if not want:
         from PIL import Image
-        names = IDS + ['halloween_scare', 'holo']; w, h = 480, 270; cols = 5; sheet = Image.new('RGB', (w * cols, h * -(-len(names) // cols)))
+        names = IDS + ['halloween_scare', 'holo']; w, h = 480, 270; cols = 4; sheet = Image.new('RGB', (w * cols, h * -(-len(names) // cols)))
         for k, n in enumerate(names): sheet.paste(Image.open(OUT / f'{n}.png').resize((w, h)), ((k % cols) * w, (k // cols) * h))
         sheet.save(OUT / 'all-holidays.png')
     print('console/page errors:', errors or 'none'); sys.exit(1 if errors else 0)

@@ -44,7 +44,7 @@ lua5.4 dev/dates_test.lua        # date rules (Easter, nth/last weekday, observe
 lua5.4 dev/export_world.lua      # regenerate web/js/preview-world.js after editing config_world.lua
 ```
 Browser preview: open `web/index.html?holiday=<id>` (christmas, halloween, valentines, easter, stpatricks, independence,
-thanksgiving, new_years_eve, new_years, memorial, veterans, mlk, presidents, mothers_day, juneteenth, fathers_day, labor, columbus). Extras: `&force=trick`, `&closed` (contest results), `&art`, `&skin=holo`, `?admin`.
+thanksgiving, new_years_eve, new_years, memorial, labor). Extras: `&force=trick`, `&closed` (contest results), `&art`, `&skin=holo`, `?admin`.
 Skills: `/preview [id]`, `/smoke-test`.
 
 ## How it fits together
@@ -54,10 +54,10 @@ Skills: `/preview [id]`, `/smoke-test`.
   NUI to Lua callbacks: `claim`, `play`, `close`, `adminDo`, `adminClose`, `adminPreview`.
 - `getState` returns `{date, theme, active[], upcoming[], advent?, world{id: progress[]}, contest{id: {board, ghosts}}}`; with
   Config.MenuGames also `event` and `events{id: event}`. `events` holds every active holiday's
-  experience; when two overlap (Columbus Day inside Halloween) the UI shows a "Happening now" switcher and keeps the pick in `state.sel`. `render()` in `core.js` dispatches:
+  experience; when two overlap (New Year's Eve and New Year's Day on Dec 31) the UI shows a "Happening now" switcher and keeps the pick in `state.sel`. `render()` in `core.js` dispatches:
   `advent` to `renderAdvent`, otherwise `EXPERIENCES[event.kind]`, otherwise the observance card.
 - Experience kinds: `advent`, `spots` (pick-and-reveal), `feast`, `countdown`, `tribute`. `style` reskins a kind:
-  feast `table` | `cookout` (Juneteenth) | `timecard` (Labor Day), tribute `candle` | `pledge` (MLK Day). Every holiday has an event. To add a kind: config in
+  feast `table` | `timecard` (Labor Day). Only the 11 major holidays are on the calendar (minor ones were dropped on purpose). To add a kind: config in
   `Config.Events`, a branch in `Events.state` and `play` (server/events.lua), a render fn registered in `EXPERIENCES`
   (js/events.js), scene CSS (css/events.css), art, preview data (js/preview.js) and a case in `dev/smoke.py`.
 - Themes are just CSS tokens (`--a`, `--b`, rgb variants) set by `theme()`; holidays never fork the layout.
@@ -94,5 +94,5 @@ observances (so Halloween keeps the headline on Columbus Day). Quick check: `lua
 ## Status
 Done: advent (wood + holo), 11 holiday experiences, per-holiday SVG art, admin panel, event engine, smoke tests,
 date rules, client UI bridge, month-long Halloween contest (leaderboard, podium, prize claim), world ghosts caught with
-flashlights, 35 city activities across all 18 holidays (config_world.lua), city hub menu, tablet admin panel with a City tab.
+flashlights, 21 city activities across the 11 major holidays (config_world.lua), city hub menu, tablet admin panel with a City tab.
 Not yet run in-game. Read `docs/halloween-contest.md` before touching Halloween. Update this section when status changes.

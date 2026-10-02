@@ -5,17 +5,9 @@ const PREVIEW_WORLD = {
     { key: "plunge", type: "spots", title: "Polar plunge", desc: "Wade into the ocean at any beach and take the New Year plunge.", icon: "wave", cap: 1, total: 8 },
     { key: "run", type: "spots", title: "Resolution run", desc: "Jog through the city parks. Every checkpoint counts toward your resolution.", icon: "run", cap: 5, total: 10 },
   ],
-  mlk: [
-    { key: "cleanup", type: "spots", title: "Day of service: clean up", desc: "Pick up litter around the parks and streets. A day on, not a day off.", icon: "trash", cap: 6, total: 10 },
-    { key: "garden", type: "spots", title: "Community garden", desc: "Plant something that will still be growing next year.", icon: "flower", cap: 3, total: 3 },
-  ],
   valentines: [
     { key: "roses", type: "delivery", title: "Rose delivery", desc: "Pick up roses at a flower stall and deliver them before they wilt.", icon: "heart", cap: 4, timeLimit: 600 },
     { key: "letters", type: "spots", title: "Secret admirer letters", desc: "Love letters are hidden at the most romantic spots in town.", icon: "mail", cap: 4, total: 4 },
-  ],
-  presidents: [
-    { key: "coins", type: "spots", title: "Presidential coin hunt", desc: "Commemorative coins were left near government buildings. Find them.", icon: "coin", cap: 4, total: 4 },
-    { key: "sale", type: "spots", title: "Presidents' Day sale", desc: "Every dealership is running a holiday sale. Stop by for a voucher.", icon: "car", cap: 2, total: 2 },
   ],
   stpatricks: [
     { key: "gold", type: "spots", title: "Pots of gold", desc: "The rainbow ends in the hills this year. Find the pots of gold.", icon: "coin", cap: 4, total: 4 },
@@ -25,21 +17,9 @@ const PREVIEW_WORLD = {
     { key: "eggs", type: "spots", title: "City egg hunt", desc: "Eggs are hidden in parks across the city. Look for the glow.", icon: "egg", cap: 10, total: 10 },
     { key: "baskets", type: "delivery", title: "Easter baskets", desc: "Bring baskets from the store to families around town.", icon: "gift", cap: 3, timeLimit: 600 },
   ],
-  mothers_day: [
-    { key: "bouquet", type: "delivery", title: "Bouquet for Mom", desc: "Pick up a bouquet and get it to her door before it wilts.", icon: "flower", cap: 3, timeLimit: 600 },
-    { key: "flowers", type: "spots", title: "Wildflowers", desc: "Pick wildflowers in the parks for her bouquet.", icon: "flower", cap: 6, total: 10 },
-  ],
   memorial: [
     { key: "wreath", type: "spots", title: "Lay a wreath", desc: "Visit the memorials and pay your respects.", icon: "flame", cap: 3, total: 3 },
     { key: "silence", type: "gathering", title: "National moment of remembrance", desc: "At 3 pm the city pauses for a moment of silence at Legion Square.", icon: "clock", cap: 1, at: "15:00" },
-  ],
-  juneteenth: [
-    { key: "grills", type: "spots", title: "Freedom Day cookout", desc: "Grills are fired up at parks across town. Help cook for the neighborhood.", icon: "grill", cap: 4, total: 10 },
-    { key: "celebration", type: "gathering", title: "Freedom celebration", desc: "Fireworks over Legion Square at 8 pm. Be there.", icon: "firework", cap: 1, at: "20:00" },
-  ],
-  fathers_day: [
-    { key: "grill", type: "spots", title: "Grill master", desc: "Backyard grills are waiting. Flip some burgers like Dad taught you.", icon: "grill", cap: 4, total: 21 },
-    { key: "fishing", type: "spots", title: "Fishing with Dad", desc: "Cast a line off any pier in the county.", icon: "fish", cap: 3, total: 4 },
   ],
   independence: [
     { key: "pads", type: "spots", title: "Launch the fireworks", desc: "Launch pads are set up on the beaches. Light one and the whole beach sees it.", icon: "firework", cap: 4, total: 8 },
@@ -49,16 +29,8 @@ const PREVIEW_WORLD = {
     { key: "shifts", type: "spots", title: "Holiday shifts", desc: "Construction sites pay double today. Put in a shift at each one.", icon: "hardhat", cap: 4, total: 4 },
     { key: "haul", type: "delivery", title: "Haul supplies", desc: "Carry supplies from the store to a work site.", icon: "box", cap: 3, timeLimit: 900 },
   ],
-  columbus: [
-    { key: "dig", type: "spots", title: "Beachcombing", desc: "Dig along the beaches for sea glass, old maps and the odd sunken chest.", icon: "compass", cap: 4, total: 8 },
-    { key: "lookouts", type: "spots", title: "Coastal lookouts", desc: "Take in the view from the high points and learn the land's history.", icon: "binoculars", cap: 4, total: 4 },
-  ],
   halloween: [
     { key: "doors", type: "spots", title: "Trick or treat", desc: "Knock on doors with a pumpkin on your map. Every door scores contest points.", icon: "door", cap: 15, total: 21 },
-  ],
-  veterans: [
-    { key: "salute", type: "spots", title: "Salute at the memorials", desc: "Visit each memorial and salute those who served.", icon: "flag", cap: 3, total: 3 },
-    { key: "packages", type: "delivery", title: "Care packages", desc: "Bring care packages from the store to veterans around town.", icon: "box", cap: 3, timeLimit: 600 },
   ],
   thanksgiving: [
     { key: "fooddrive", type: "delivery", title: "Food drive", desc: "Pick up donated food at a store and deliver it to a family in need.", icon: "box", cap: 4, timeLimit: 600 },

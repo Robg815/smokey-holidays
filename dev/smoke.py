@@ -16,15 +16,14 @@ with sync_playwright() as p:
     def go(q): pg.goto(URL + q); pg.wait_for_timeout(1800)
 
     # ---- City hub (default): every holiday lists its city activities ----
-    IDS = ['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'veterans',
-           'mlk', 'presidents', 'mothers_day', 'juneteenth', 'fathers_day', 'labor', 'columbus']
+    IDS = ['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'labor']
     for hid in IDS:
         go(f'?holiday={hid}')
         n = pg.evaluate(f"(PREVIEW_WORLD['{hid}'] || []).length")
         check(f'hub {hid}: {n} city activities as cards with own art', n >= 1 and pg.locator('.act-grid .act[data-type=spots], .act-grid .act[data-type=delivery], .act-grid .act[data-type=gathering]').count() == n
               and f'img/{hid}/' in pg.evaluate("document.getElementById('hero').style.backgroundImage") and pg.locator('#stats .stat').count() >= 2)
-    go('?holiday=juneteenth')
-    pg.click('.act .wp[data-key=grills]'); pg.wait_for_timeout(300)
+    go('?holiday=independence')
+    pg.click('.act .wp[data-key=pads]'); pg.wait_for_timeout(300)
     check('hub: set waypoint answers with a toast', 'Waypoint set' in pg.inner_text('#msg'))
     check('hub: gathering card counts down', pg.locator('.act[data-type=gathering] .cd').count() == 1 and 'h' in pg.inner_text('.act[data-type=gathering] .cd'))
     go('?holiday=valentines')
@@ -42,10 +41,10 @@ with sync_playwright() as p:
     check('hub: closed contest shows the podium and a claim button', pg.locator('.podium .pod').count() == 3 and pg.locator('.grace.ready[data-arg="8"]').count() == 1)
     pg.click('.grace.ready'); pg.wait_for_timeout(400)
     check('hub: claiming the prize marks it claimed', pg.evaluate('state.event.contest.prize.claimed') is True)
-    go('?holiday=columbus&both')
-    check('hub overlap: switcher for both holidays', pg.locator('#now .pick').count() == 2 and pg.inner_text('#title').startswith('Columbus'))
-    pg.click('#now .pick[data-sel=halloween]'); pg.wait_for_timeout(300)
-    check('hub overlap: switching shows Halloween activities and board', pg.inner_text('#title') == 'Halloween' and pg.locator('.act-grid .act').count() == 2 and pg.inner_text('.list-card h2') == 'Leaderboard')
+    go('?holiday=new_years_eve&both')
+    check("hub overlap (Dec 31): switcher for New Year's Eve and New Year's Day", pg.locator('#now .pick').count() == 2 and pg.inner_text('#title') == "New Year's Eve")
+    pg.click('#now .pick[data-sel=new_years]'); pg.wait_for_timeout(300)
+    check("hub overlap: switching shows New Year's Day activities", pg.inner_text('#title') == "New Year's Day" and pg.locator('.act-grid .act').count() == 2)
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
     check('hub: esc hides the UI and stops the countdown timers', pg.evaluate("document.getElementById('app').classList.contains('hidden')") and pg.evaluate('timers.length') == 0)
 
@@ -78,24 +77,16 @@ with sync_playwright() as p:
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
     check('esc hides the UI', pg.evaluate("document.getElementById('app').classList.contains('hidden')"))
     check('timers stop when hidden', pg.evaluate('timers.length') == 0)
-    for hid in ('presidents', 'mothers_day', 'fathers_day', 'columbus'):  # every pick-and-reveal holiday plays
-        go(f'?holiday={hid}&games'); u0 = pg.evaluate('state.event.used'); pg.click('.spot:not([disabled])'); pg.wait_for_timeout(400)
-        check(f'{hid}: a pick reveals a reward', pg.evaluate('state.event.used') == u0 + 1 and pg.locator('.reveal, .msg:not(:empty)').count() >= 1)
-    go('?holiday=columbus&both&games')
-    check('overlap: switcher lists both holidays, opens on the day-of one', pg.locator('#now .pick').count() == 2 and pg.evaluate('state.event.id') == 'columbus' and 'Halloween' not in pg.inner_text('#upcoming'))
-    pg.click('#now .pick[data-sel=halloween]'); pg.wait_for_timeout(300)
-    check('overlap: switching shows Halloween with its own theme and board', pg.evaluate('state.event.id') == 'halloween' and pg.inner_text('#title') == 'Halloween' and pg.inner_text('#now h2') == 'Happening now' and pg.inner_text('.list-card h2') == 'Leaderboard' and pg.locator('#upcoming.board').count() == 1)
+    go('?holiday=valentines&games'); u0 = pg.evaluate('state.event.used'); pg.click('.spot:not([disabled])'); pg.wait_for_timeout(400)
+    check('valentines: a pick reveals a reward', pg.evaluate('state.event.used') == u0 + 1)
+    go('?holiday=new_years_eve&both&games')
+    check('overlap: switcher lists both holidays, opens on the day-of one', pg.locator('#now .pick').count() == 2 and pg.evaluate('state.event.id') == 'new_years_eve' and "New Year's Day" not in pg.inner_text('#upcoming'))
+    pg.click('#now .pick[data-sel=new_years]'); pg.wait_for_timeout(300)
+    check("overlap: switching shows New Year's Day with its own game", pg.evaluate('state.event.id') == 'new_years' and pg.inner_text('#title') == "New Year's Day" and pg.inner_text('#now h2') == 'Happening now' and pg.locator('.spot').count() == 3)
     go('?holiday=easter&games')
     check('switcher hidden with one holiday', pg.locator('#now').is_hidden())
-    go('?holiday=juneteenth&games'); pg.click('.plate.ready'); pg.wait_for_timeout(400)
-    check('juneteenth: cookout dish grabbed', pg.evaluate('state.event.dishes[2].status') == 'served' and pg.locator('.cloth.gingham').count() == 1)
     go('?holiday=labor&games'); pg.click('.punch.ready'); pg.wait_for_timeout(400)
     check('labor: shift punched and stamped', pg.evaluate('state.event.dishes[3].status') == 'served' and pg.locator('.timecard .stamp').count() == 4)
-    go('?holiday=mlk&games'); pg.click('.candle-btn.pledge'); pg.wait_for_timeout(400)
-    check('mlk: pledge signed and counted', pg.evaluate('state.event.lit') is True and pg.evaluate('state.event.total') == 643)
-    for hid in ('mlk', 'presidents', 'mothers_day', 'juneteenth', 'fathers_day', 'labor', 'columbus'):
-        go(f'?holiday={hid}&games')
-        check(f'{hid}: own art and stat cards', f'img/{hid}/' in pg.evaluate("document.getElementById('hero').style.backgroundImage") and pg.locator('#stats .stat').count() >= 2)
     go('?holiday=thanksgiving&games'); pg.click('.plate.ready'); pg.wait_for_timeout(400)
     check('feast: dish gets served', pg.evaluate('state.event.dishes[3].status') == 'served')
     go('?holiday=memorial&games'); pg.click('.candle-btn'); pg.wait_for_timeout(400)
@@ -117,7 +108,7 @@ with sync_playwright() as p:
     check('admin: date override reflected', 'overridden' in pg.inner_text('.adm header'))
     check('admin: ghost count in header', 'ghosts active' in pg.inner_text('.adm header'))
     pg.click('button[data-tab=city]'); pg.wait_for_timeout(150)
-    check('admin: city tab lists every holiday with its activities', pg.locator('.cityh').count() == 18 and pg.locator('.cityh button[data-a=tp]').count() >= 35)
+    check('admin: city tab lists every holiday with its activities', pg.locator('.cityh').count() == 11 and pg.locator('.cityh button[data-a=tp]').count() == pg.evaluate('Object.values(PREVIEW_WORLD).flat().length'))
     pg.click('.cityh button[data-a=tp]'); pg.wait_for_timeout(200)
     check('admin: go there teleports', 'Teleported' in pg.inner_text('.adm .note'))
     pg.click('button[data-tab=halloween]'); pg.wait_for_timeout(150)
