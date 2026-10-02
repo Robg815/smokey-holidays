@@ -1,0 +1,36 @@
+/* Admin test panel: deliberately plain and dense, separate from the holiday look */
+#admin { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 3vh 3vw; background: rgba(3,7,12,.66); backdrop-filter: blur(3px); }
+#admin.off { display: none; }
+.adm { width: min(980px, 96vw); max-height: 92vh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; color: #dbe6f0; background: #0c131b; border: 1px solid #223244; border-radius: 12px; box-shadow: 0 30px 90px rgba(0,0,0,.65); font: 14px/1.45 'Segoe UI', system-ui, sans-serif; scrollbar-width: thin; }
+.adm header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 22px 26px 14px; border-bottom: 1px solid #1b2a3a; }
+.adm .body { display: grid; gap: 16px; align-content: start; padding: 16px 26px; overflow: auto; min-height: 0; scrollbar-width: thin; }
+.adm h2 { margin: 0; font-size: 20px; font-weight: 600; color: #fff; }
+.adm h3 { margin: 0 0 10px; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #7f93a8; }
+.adm p { margin: 2px 0 0; color: #8fa3b8; } .adm b { color: #e8f1fa; font-weight: 600; }
+.adm section { padding: 14px 16px; border: 1px solid #1b2a3a; border-radius: 10px; background: #0f1822; }
+.adm .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; } .adm .row:last-child { margin-bottom: 0; }
+.adm .hb { display: flex; gap: 8px; }
+.adm button { font: inherit; color: #dbe6f0; background: #172433; border: 1px solid #2a3d52; border-radius: 8px; padding: 7px 12px; cursor: pointer; transition: background .15s, border-color .15s; }
+.adm button:hover { background: #1e3147; border-color: #3b5877; } .adm button:disabled { opacity: .4; cursor: default; }
+.adm button.chip { padding: 4px 10px; font-size: 12.5px; border-radius: 999px; }
+.adm input[type=date], .adm input[type=text] { font: inherit; color: #e8f1fa; background: #0a1118; border: 1px solid #2a3d52; border-radius: 8px; padding: 6px 10px; color-scheme: dark; }
+.adm label { display: inline-flex; align-items: center; gap: 8px; color: #9fb2c6; }
+.adm :focus-visible { outline: 2px solid #5ff3ff; outline-offset: 2px; }
+.adm table { width: 100%; border-collapse: collapse; }
+.adm th { padding: 0 8px 8px; text-align: left; font-size: 12px; font-weight: 600; color: #7f93a8; }
+.adm td { padding: 7px 8px; border-top: 1px solid #172333; vertical-align: middle; }
+.adm tr.dim td:not(.tg) { opacity: .5; }
+.adm td.nm { display: flex; align-items: center; gap: 10px; min-width: 240px; } .adm td.nm img { width: 26px; height: 26px; }
+.adm td.kd { color: #8fa3b8; font-size: 13px; } .adm td.rt { text-align: right; }
+.tag { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-style: normal; font-weight: 600; } .tag.live { background: #12351f; color: #7dffb0; } .tag.force { background: #3a2a0a; color: #ffc86b; }
+.sw { position: relative; display: inline-block; width: 38px; height: 22px; }
+.sw input { position: absolute; inset: 0; z-index: 1; margin: 0; opacity: 0; cursor: pointer; }
+.sw i { position: absolute; inset: 0; border-radius: 999px; background: #2a3a4c; transition: background .15s; }
+.sw i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #cfdbe8; transition: transform .15s; }
+.sw input:checked + i { background: #1fa86a; } .sw input:checked + i::after { transform: translateX(16px); }
+.sw input:disabled { cursor: default; } .sw input:disabled + i { opacity: .4; } .sw input:focus-visible + i { outline: 2px solid #5ff3ff; outline-offset: 2px; }
+.adm footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 26px 16px; border-top: 1px solid #1b2a3a; }
+.adm .note { min-height: 20px; margin: 0; color: #7dffb0; } .adm .hint { font-size: 12.5px; color: #6f8399; }
+.adm .lbl { min-width: 84px; color: #9fb2c6; }
+.adm button.warn { border-color: #6a3030; } .adm button.warn:hover { background: #3a1a1a; border-color: #8a4040; }
+.adm button.warn[data-armed] { color: #ffb4a8; border-color: #c05040; background: #3a1a1a; }

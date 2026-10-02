@@ -2,30 +2,17 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-version '2.0.0'
-
-name 'smokey-holidays'
+name 's2-holidays'
+description 'Calendar-driven US holidays with a hologram NUI, advent calendar, seasonal experiences and an admin test panel'
+version '1.0.0'
 author 'Smokey'
-description 'Configurable holiday collectible system for QBX with client-spawned props'
 
-shared_scripts {
-    '@ox_lib/init.lua',
-    'config.lua'
-}
+ui_page 'web/index.html'
 
-client_scripts {
-    'client.lua'
-}
+shared_scripts { '@ox_lib/init.lua', 'config.lua' }
+client_scripts { 'client/main.lua', 'client/events.lua', 'client/admin.lua', 'client/ghosts.lua' }
+server_scripts { '@oxmysql/lib/MySQL.lua', 'server/dates.lua', 'server/admin.lua', 'server/events.lua', 'server/ghosts.lua', 'server/main.lua' }
 
-server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'server.lua'
-}
+files { 'web/index.html', 'web/css/*.css', 'web/js/*.js', 'web/img/*.svg', 'web/img/**/*.svg' }
 
-dependencies {
-    'ox_lib',
-    'ox_target',
-    'ox_inventory',
-    'oxmysql',
-    'qbx_core'
-}
+dependencies { 'ox_lib', 'qbx_core', 'ox_inventory', 'oxmysql' }

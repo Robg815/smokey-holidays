@@ -1,151 +1,220 @@
 Config = {}
 
-Config.Debug = false
+Config.Command = 'holidays'
+Config.Key = 'F7'                 -- default keybind (players can rebind in settings)
+Config.UtcOffset = nil            -- nil = server local time, or a number of hours from UTC (e.g. -6)
+Config.UseObservedDates = true    -- federal fixed-date holidays shift to Fri/Mon when on a weekend
+Config.LoginNotify = true         -- tell players about active holidays when they load in
+Config.DebugDate = nil            -- 'YYYY-MM-DD' to fake today's date for testing, e.g. '2026-12-12'
 
-Config.CashItem = 'cash'
+Config.DefaultWindow = { before = 1, after = 0 } -- days a holiday counts as "active" around its date
 
-Config.PropModels = {
-    `tstudio_legionsquare_asset_egg01`,
-    `tstudio_legionsquare_asset_egg02`,
-    `tstudio_legionsquare_asset_egg03`,
-    `tstudio_legionsquare_asset_egg04`,
-    `tstudio_legionsquare_asset_egg05`,
-    `tstudio_legionsquare_asset_egg06`,
-    `tstudio_legionsquare_asset_egg07`,
-    `tstudio_legionsquare_asset_egg08`,
-    `tstudio_legionsquare_asset_egg09`,
-    `tstudio_legionsquare_asset_egg10`,
-    `prop_alien_egg_01`
+-- Hologram colours. a = main projection colour, b = highlight/ready colour.
+Config.Themes = {
+    default      = { a = '#5ff3ff', b = '#8affc7' },
+    winter       = { a = '#8fd8ff', b = '#ffffff' },
+    christmas    = { a = '#ff5a6e', b = '#6dffb0' },
+    halloween    = { a = '#ff8a1f', b = '#b06cff' },
+    patriotic    = { a = '#5b8cff', b = '#ff6b6b' },
+    autumn       = { a = '#ffb347', b = '#ff7a45' },
+    valentines   = { a = '#ff6fb5', b = '#ffc2e0' },
+    stpatricks   = { a = '#4dff8a', b = '#e6ff7a' },
+    spring       = { a = '#c79bff', b = '#8affc7' },
+    memorial     = { a = '#7fa8ff', b = '#ff7a7a' },
 }
 
-Config.UseRare = true
-
-Config.Admin = {
-    LeaderboardCommand = 'holidayleaderboard',
-    StatsCommand = 'myholidaystats',
-    AcePermission = 'smokeyholidays.admin'
+-- Rule types:
+--   { type = 'fixed',  month = 7, day = 4 }
+--   { type = 'nth',    month = 11, weekday = 4, n = 4 }   weekday: 0 = Sunday ... 6 = Saturday
+--   { type = 'last',   month = 5, weekday = 1 }
+--   { type = 'easter', offset = 0 }
+-- Optional per holiday: before / after (window in days), federal (enables observed shifting), enabled = false
+Config.Holidays = {
+    { id = 'new_years',    label = "New Year's Day",             federal = true, theme = 'winter',     rule = { type = 'fixed', month = 1, day = 1 },            blurb = 'A fresh year on the streets of Los Santos.' },
+    { id = 'mlk',          label = 'Martin Luther King Jr. Day', federal = true, theme = 'default',    rule = { type = 'nth', month = 1, weekday = 1, n = 3 },   blurb = 'A day on, not a day off.' },
+    { id = 'valentines',   label = "Valentine's Day",            theme = 'valentines', rule = { type = 'fixed', month = 2, day = 14 },                          blurb = 'Flowers, dinners and questionable decisions.' },
+    { id = 'presidents',   label = "Presidents' Day",            federal = true, theme = 'patriotic',  rule = { type = 'nth', month = 2, weekday = 1, n = 3 },   blurb = 'Big sales at every dealership in town.' },
+    { id = 'stpatricks',   label = "St. Patrick's Day",          theme = 'stpatricks', rule = { type = 'fixed', month = 3, day = 17 },                          blurb = 'Green everything. Pubs will be busy.' },
+    { id = 'easter',       label = 'Easter',                     theme = 'spring',     rule = { type = 'easter', offset = 0 }, before = 2,                      blurb = 'Egg hunts across the city.' },
+    { id = 'mothers_day',  label = "Mother's Day",               theme = 'valentines', rule = { type = 'nth', month = 5, weekday = 0, n = 2 },                  blurb = 'Call your mom. Seriously.' },
+    { id = 'memorial',     label = 'Memorial Day',               federal = true, theme = 'memorial',   rule = { type = 'last', month = 5, weekday = 1 },         blurb = 'Remembering those who served.' },
+    { id = 'juneteenth',   label = 'Juneteenth',                 federal = true, theme = 'patriotic',  rule = { type = 'fixed', month = 6, day = 19 },           blurb = 'Freedom Day celebrations across the state.' },
+    { id = 'fathers_day',  label = "Father's Day",               theme = 'default',    rule = { type = 'nth', month = 6, weekday = 0, n = 3 },                  blurb = 'Grills are lit. Dad jokes are mandatory.' },
+    { id = 'independence', label = 'Independence Day',           federal = true, theme = 'patriotic',  rule = { type = 'fixed', month = 7, day = 4 }, before = 2, after = 1, blurb = 'Fireworks over the pier tonight.' },
+    { id = 'labor',        label = 'Labor Day',                  federal = true, theme = 'autumn',     rule = { type = 'nth', month = 9, weekday = 1, n = 1 },   blurb = 'Last long weekend of summer.' },
+    { id = 'columbus',     label = "Columbus / Indigenous Peoples' Day", federal = true, theme = 'autumn', rule = { type = 'nth', month = 10, weekday = 1, n = 2 }, blurb = 'Federal holiday. Government offices are closed.' },
+    { id = 'halloween',    label = 'Halloween',                  theme = 'halloween',  rule = { type = 'fixed', month = 10, day = 31 }, before = 30, after = 7,  blurb = 'The city is not as empty as it looks after dark.' },
+    { id = 'veterans',     label = 'Veterans Day',               federal = true, theme = 'memorial',   rule = { type = 'fixed', month = 11, day = 11 },          blurb = 'Honoring all who served.' },
+    { id = 'thanksgiving', label = 'Thanksgiving',               federal = true, theme = 'autumn',     rule = { type = 'nth', month = 11, weekday = 4, n = 4 }, before = 2, after = 1, blurb = 'Turkey, family and a lot of traffic.' },
+    { id = 'christmas',    label = 'Christmas',                  federal = true, theme = 'christmas',  rule = { type = 'fixed', month = 12, day = 25 }, before = 24, after = 1, blurb = 'Snow on the pier, lights on every block.' },
+    { id = 'new_years_eve',label = "New Year's Eve",             theme = 'winter',     rule = { type = 'fixed', month = 12, day = 31 },                         blurb = 'Countdown at midnight.' },
 }
 
-Config.Leaderboard = {
-    EventKey = 'seasonal',
-    Title = 'Holiday Leaderboard',
-    StatsTitle = 'My Holiday Stats',
-    NormalLabel = 'Collects',
-    RareLabel = 'Rare Collects'
-}
-
-Config.Settings = {
+-- Advent calendar (shown while the Christmas window is active)
+Config.Advent = {
     enabled = true,
-    eventName = 'Holiday Hunt',
-
-    interactionDistance = 2.0,
-    maxCollectDistance = 3.0,
-    collectDuration = 2500,
-    scenario = 'PROP_HUMAN_BUM_BIN',
-
-    respawnTime = 300,
-    rareRespawnTime = 900,
-    oneTimePerRestart = true,
-
-    normalPoints = 1,
-
-    normalGlow = {
-        enabled = true,
-        markerType = 1,
-        markerScale = vec3(0.18, 0.18, 0.07),
-        markerColor = { r = 0, g = 120, b = 255, a = 160 },
-        lightColor = { r = 0, g = 120, b = 255 },
-        lightRange = 2.8,
-        lightIntensity = 4.0
+    startMonth = 12, startDay = 1,
+    days = 24,
+    requiredMinutes = 30,          -- minutes online that same day before a door can be opened
+    overrides = { [24] = 60 },     -- per-door override of requiredMinutes
+    allowCatchUp = false,          -- true = missed doors can still be opened later in the season
+    skin = 'wood',                 -- 'wood' (matches the reference) or 'holo' (glass drawers with line art)
+    images = { [1] = 'img/door1.svg', [4] = 'img/door4.svg', [5] = 'img/door5.svg', [7] = 'img/door7.svg', [8] = 'img/door8.svg', [11] = 'img/door11.svg', [12] = 'img/door12.svg', [13] = 'img/door13.svg', [16] = 'img/door16.svg', [19] = 'img/door19.svg', [22] = 'img/door22.svg' }, -- optional custom art per door, e.g. [1] = 'img/door1.png' (put files in web/img/)
+    -- Drawer layout: one row per line, { door number, relative width, optional 'flip' to put the art on the left }. Any arrangement works as long as every door appears once.
+    layout = {
+        { {1, 4.6}, {2, 2.4}, {3, 2.4}, {4, 4.4} },
+        { {5, 2.4}, {6, 2.4}, {7, 4.4, 'flip'}, {8, 4.3} },
+        { {9, 2.3}, {10, 1.6}, {11, 2.4, 'flip'}, {12, 4.4, 'flip'}, {13, 2.4} },
+        { {14, 1.6}, {15, 1.6}, {16, 4.4, 'flip'}, {17, 1.8}, {18, 1.6}, {19, 2.5, 'flip'} },
+        { {20, 1.6}, {21, 4.4}, {22, 4.4, 'flip'}, {23, 1.7}, {24, 1.7} },
     },
-
-    normalParticles = {
-        enabled = true,
-        dict = 'core',
-        name = 'ent_amb_magic_blue',
-        scale = 0.20,
-        offset = vec3(0.0, 0.0, -0.20),
-        rotation = vec3(0.0, 0.0, 0.0)
-    },
-
-    rareCollectibles = {
-        enabled = true,
-        points = 5,
-        rewardMultiplier = 2,
-
-        glow = {
-            enabled = true,
-            markerType = 1,
-            markerScale = vec3(0.18, 0.18, 0.08),
-            markerColor = { r = 255, g = 215, b = 0, a = 180 },
-            lightColor = { r = 255, g = 215, b = 80 },
-            lightRange = 3.5,
-            lightIntensity = 5.0
-        },
-
-        particles = {
-            enabled = true,
-            dict = 'core',
-            name = 'ent_amb_sparking_wires_sp',
-            scale = 0.20,
-            offset = vec3(0.0, 0.0, -0.18),
-            rotation = vec3(0.0, 0.0, 0.0)
-        },
-
-        rewards = {
-            { type = 'item', name = 'repairkit', amount = 1, chance = 25 },
-            { type = 'item', name = 'advancedlockpick', amount = 1, chance = 15 },
-            { type = 'item', name = 'cash', amount = 1500, chance = 35 },
-            { type = 'item', name = 'goldbar', amount = 1, chance = 15 },
-            { type = 'item', name = 'medikit', amount = 1, chance = 10 }
-        }
-    },
-
+    -- Icon per door (in door order). Available: snowflake star bell gift holly candycane wreath tree snowman hat ornament deer poinsettia ho
+    icons = { 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'snowflake', 'ho', 'snowflake', 'snowflake', 'snowflake' },  -- pale snowflake decals on drawers without art
     rewards = {
-        { type = 'item', name = 'lc_coffee', amount = 1, chance = 20 },
-        { type = 'item', name = 'lcgumbo', amount = 1, chance = 20 },
-        { type = 'item', name = 'bandage', amount = 1, chance = 20 },
-        { type = 'item', name = 'lockpick', amount = 1, chance = 10 },
-        { type = 'item', name = 'cash', amount = 1000, chance = 10 },
-        { type = 'item', name = 'cash', amount = 500, chance = 20 }
-    }
+        [1]  = { label = 'Snack pack',     items = { { name = 'sandwich', count = 2 }, { name = 'water', count = 2 } } },
+        [2]  = { label = 'Pocket cash',    cash = 250 },
+        [3]  = { label = 'First aid',      items = { { name = 'bandage', count = 3 } } },
+        [4]  = { label = 'Hot cocoa',      items = { { name = 'cola', count = 3 } } },
+        [5]  = { label = 'Lockpick',       items = { { name = 'lockpick', count = 1 } } },
+        [6]  = { label = 'Stocking cash',  cash = 400 },
+        [7]  = { label = 'Burger night',   items = { { name = 'burger', count = 3 } } },
+        [8]  = { label = 'Radio',          items = { { name = 'radio', count = 1 } } },
+        [9]  = { label = 'Cash gift',      cash = 500 },
+        [10] = { label = 'Care package',   items = { { name = 'bandage', count = 5 }, { name = 'water', count = 3 } } },
+        [11] = { label = 'Repair kit',     items = { { name = 'repairkit', count = 1 } } },
+        [12] = { label = 'Cash gift',      cash = 750 },
+        [13] = { label = 'Dinner',         items = { { name = 'burger', count = 2 }, { name = 'cola', count = 2 } } },
+        [14] = { label = 'Lockpick set',   items = { { name = 'lockpick', count = 2 } } },
+        [15] = { label = 'Cash gift',      cash = 900 },
+        [16] = { label = 'Armor',          items = { { name = 'armour', count = 1 } } },
+        [17] = { label = 'Snack pack',     items = { { name = 'sandwich', count = 4 } } },
+        [18] = { label = 'Cash gift',      cash = 1000 },
+        [19] = { label = 'Repair kits',    items = { { name = 'repairkit', count = 2 } } },
+        [20] = { label = 'Phone upgrade',  items = { { name = 'phone', count = 1 } } },
+        [21] = { label = 'Cash gift',      cash = 1250 },
+        [22] = { label = 'Armor pair',     items = { { name = 'armour', count = 2 } } },
+        [23] = { label = 'Cash gift',      cash = 1500 },
+        [24] = { label = 'Christmas Eve',  cash = 3000, items = { { name = 'armour', count = 2 }, { name = 'repairkit', count = 2 } } },
+    },
 }
 
-Config.Coords = {
-    [1] = { coords = vec3(182.92, -886.03, 29.21), heading = 0.0, rare = true },
-    [2] = { coords = vec3(184.0253, -987.8967, 30.9098), heading = 0.0, rare = false },
-    [3] = { coords = vec3(161.8425, -948.7531, 31.4095), heading = 0.0, rare = false },
-    [4] = { coords = vec3(185.7218, -894.9673, 30.2113), heading = 0.0, rare = true },
-    [5] = { coords = vec3(250.1366, -890.5364, 30.0377), heading = 0.0, rare = false },
-    [6] = { coords = vec3(21.2130, -832.6239, 31.2661), heading = 0.0, rare = false },
-    [7] = { coords = vec3(54.3495, -594.9211, 32.5827), heading = 0.0, rare = false },
-    [8] = { coords = vec3(124.8617, -866.7628, 37.0431), heading = 0.0, rare = false },
-    [9] = { coords = vec3(-2010.8252, -1326.1555, 2.5225), heading = 0.0, rare = false },
-    [10] = { coords = vec3(-1917.3616, -1373.4999, 3.1613), heading = 0.0, rare = false },
-    [11] = { coords = vec3(-1840.3177, -1339.7457, 1.6222), heading = 0.0, rare = false },
-    [12] = { coords = vec3(-1830.9971, -1314.6339, 2.5024), heading = 0.0, rare = false },
-    [13] = { coords = vec3(-1639.2811, -1070.6792, 13.1539), heading = 0.0, rare = false },
-    [14] = { coords = vec3(-1474.1632, -959.3866, 10.1930), heading = 0.0, rare = false },
-    [15] = { coords = vec3(-1555.8093, -1151.6647, 2.3379), heading = 0.0, rare = false },
-    [16] = { coords = vec3(-1177.6646, -314.0897, 38.3075), heading = 0.0, rare = false },
-    [17] = { coords = vec3(359.8471, -992.0363, 29.3451), heading = 0.0, rare = false },
-    [18] = { coords = vec3(300.0072, -969.1445, 29.3856), heading = 0.0, rare = false },
-    [19] = { coords = vec3(255.3408, -1016.6566, 29.6928), heading = 0.0, rare = false },
-    [20] = { coords = vec3(144.1275, -1534.9612, 29.1417), heading = 0.0, rare = false },
-    [21] = { coords = vec3(-51.6798, -1740.7732, 29.6400), heading = 0.0, rare = false },
-    [22] = { coords = vec3(63.2235, -1852.8613, 22.8478), heading = 0.0, rare = false },
-    [23] = { coords = vec3(558.2983, -892.7911, 13.2657), heading = 0.0, rare = false },
-    [24] = { coords = vec3(891.3182, -175.2380, 22.8719), heading = 0.0, rare = false },
-    [25] = { coords = vec3(617.6639, -415.3621, -1.2256), heading = 0.0, rare = false },
-    [26] = { coords = vec3(301.8468, -1204.2306, 38.8924), heading = 0.0, rare = false },
-    [27] = { coords = vec3(681.4825, -996.9814, 22.9111), heading = 0.0, rare = false },
-    [28] = { coords = vec3(675.1328, -930.8517, 22.2361), heading = 0.0, rare = false },
-    [29] = { coords = vec3(948.0574, 96.0657, 80.8748), heading = 0.0, rare = false },
-    [30] = { coords = vec3(286.5584, 213.4559, 104.7229), heading = 0.0, rare = false },
-    [31] = { coords = vec3(-35.62, -1108.44, 26.42), heading = 0.0, rare = true },
-    [32] = { coords = vec3(-118.33, -1030.88, 27.27), heading = 0.0, rare = false },
-    [33] = { coords = vec3(-140.75, -945.18, 29.14), heading = 0.0, rare = true },
-    [34] = { coords = vec3(38.92, -1040.52, 29.34), heading = 0.0, rare = true },
-    
-    
+-- ==========================================================================
+-- Per-holiday experiences. The server rolls every outcome; the UI only shows it.
+--   kind = 'spots'  N things to open (doors, envelopes, eggs...), `picks` per day, weighted outcomes
+--   kind = 'feast'  dishes unlocked by playtime, then a finale
+-- Outcome kinds the UI reacts to: 'trick' = jump scare, 'empty'/'dud' = nothing, 'ghost' = ghost, anything else = a win.
+-- Items must exist in ox_inventory; swap in your own (candy, roses, fireworks...).
+-- ==========================================================================
+Config.Events = {
+    halloween = {
+        kind = 'spots', title = 'Trick or Treat', spots = 5, picks = 5, -- 5 houses per night, all October
+        outcomes = {
+            { kind = 'treat', weight = 55, label = 'Candy haul',  points = 10, cash = 150, items = { { name = 'sandwich', count = 1 } }, msg = 'Full-size bars. Jackpot.' },
+            { kind = 'trick', weight = 25, label = 'Jump scare',  points = 5,  cash = 50,  msg = 'Something jumped out. Here is a little hush money.' },
+            { kind = 'ghost', weight = 8,  label = 'Ghost loot',  points = 25, cash = 600, msg = 'A ghost slipped you something.' },
+            { kind = 'empty', weight = 12, label = 'Nobody home', points = 1,  msg = 'The lights are off. Nobody is home... probably.' },
+        },
+        -- The ghost that drifts across the trick-or-treat screen (once per night)
+        ghostCatch = { label = 'Caught a ghost', points = 20, cash = 400, items = { { name = 'bandage', count = 2 } }, msg = 'It squeaked, then vanished.' },
+
+        -- Points add up all month. The board closes at the end of `endsDay`; the top finishers can claim a prize until the window ends.
+        contest = {
+            endsMonth = 10, endsDay = 31, endsHour = 24, -- 24 = midnight at the end of Halloween night
+            boardSize = 10,
+            names = 'initial',                           -- how names show on the board: 'full' | 'initial' | 'none'
+            hint = 'Treats +10, ghost loot +25, catch ghosts around the city +30.',
+            prizes = {                                   -- index = final place
+                { label = 'Halloween Champion', cash = 25000, items = { { name = 'armour', count = 3 } }, msg = 'You ruled the night. Congratulations!' },
+                { label = 'Runner-up',          cash = 10000, items = { { name = 'armour', count = 1 } }, msg = 'So close. Impressive month.' },
+                { label = 'Third place',        cash = 5000,  msg = 'On the podium. Well played.' },
+            },
+        },
+
+        -- Ghosts caught out in the world (spawning rules live in Config.Ghosts)
+        world = { label = 'Ghost caught', points = 30, cash = 250, items = { { name = 'bandage', count = 1 } }, perDay = 8, msg = 'It dissolved into a handful of cash.' },
+    },
+    valentines = {
+        kind = 'spots', title = 'Secret Admirer', spots = 6, picks = 1,
+        outcomes = {
+            { kind = 'gift',    weight = 45, label = 'Chocolates',    items = { { name = 'sandwich', count = 2 } }, msg = 'A box of chocolates.' },
+            { kind = 'cash',    weight = 35, label = 'Love note cash', cash = 500, msg = 'There was cash folded inside.' },
+            { kind = 'jackpot', weight = 8,  label = 'Golden ticket',  cash = 2500, msg = 'Somebody really likes you.' },
+            { kind = 'empty',   weight = 12, label = 'Wrong address',  msg = 'Return to sender.' },
+        },
+    },
+    easter = {
+        kind = 'spots', title = 'Egg Hunt', spots = 8, picks = 3,
+        outcomes = {
+            { kind = 'egg',    weight = 50, label = 'Pocket cash',   cash = 200, msg = 'A few dollars wrapped in foil.' },
+            { kind = 'basket', weight = 20, label = 'Basket goodies', items = { { name = 'bandage', count = 2 }, { name = 'water', count = 2 } }, msg = 'Snacks and bandages.' },
+            { kind = 'golden', weight = 6,  label = 'Golden egg',    cash = 1500, msg = 'A golden egg. Very rare.' },
+            { kind = 'empty',  weight = 24, label = 'Cracked egg',   msg = 'Empty. Better luck with the next one.' },
+        },
+    },
+    stpatricks = {
+        kind = 'spots', title = 'Pot of Gold', spots = 5, picks = 2,
+        outcomes = {
+            { kind = 'coins', weight = 50, label = 'Gold coins',       cash = 300, msg = 'Shiny.' },
+            { kind = 'lucky', weight = 10, label = 'Four-leaf clover', cash = 2000, msg = 'Luck of the Irish.' },
+            { kind = 'dud',   weight = 40, label = 'Just clover',      msg = 'Nothing but clover.' },
+        },
+    },
+    independence = {
+        kind = 'spots', title = 'Fireworks Show', spots = 6, picks = 4,
+        outcomes = {
+            { kind = 'burst',  weight = 60, label = 'Big burst',   cash = 200, msg = 'Fireworks!' },
+            { kind = 'finale', weight = 10, label = 'Grand finale', cash = 1500, items = { { name = 'radio', count = 1 } }, msg = 'The whole sky lit up.' },
+            { kind = 'dud',    weight = 30, label = 'Fizzled',     msg = 'Dud. Try another one.' },
+        },
+    },
+    thanksgiving = {
+        kind = 'feast', title = 'The Feast',
+        dishes = { -- need = minutes online today
+            { id = 'turkey',    label = 'Roast turkey',    need = 5,  items = { { name = 'burger', count = 2 } },  msg = 'Golden brown.' },
+            { id = 'stuffing',  label = 'Stuffing',        need = 10, items = { { name = 'sandwich', count = 2 } }, msg = 'Just like grandma made it.' },
+            { id = 'pie',       label = 'Pumpkin pie',     need = 15, cash = 300, msg = 'Whipped cream on top.' },
+            { id = 'corn',      label = 'Sweet corn',      need = 20, items = { { name = 'water', count = 2 } }, msg = 'Buttery.' },
+            { id = 'rolls',     label = 'Dinner rolls',    need = 25, items = { { name = 'bandage', count = 2 } }, msg = 'Still warm.' },
+            { id = 'cranberry', label = 'Cranberry sauce', need = 30, cash = 500, msg = 'From the can, ridges and all.' },
+        },
+        finale = { label = 'Give thanks', cash = 2000, items = { { name = 'armour', count = 1 } }, msg = 'Everyone at the table is thankful for you.' },
+    },
+}
+
+-- New Year, remembrance and countdown experiences
+Config.Events.new_years_eve = { kind = 'countdown', title = 'Midnight Countdown' } -- display only: the ball drops through the last hour
+
+Config.Events.new_years = {
+    kind = 'spots', title = 'Resolution Cards', spots = 3, picks = 1,
+    outcomes = {
+        { kind = 'gift',    weight = 40, label = 'Fresh start',       items = { { name = 'bandage', count = 2 }, { name = 'water', count = 2 } }, msg = 'Supplies for the year ahead.' },
+        { kind = 'cash',    weight = 35, label = 'Savings goal',      cash = 800,  msg = 'A solid start to the year.' },
+        { kind = 'jackpot', weight = 10, label = 'Lucky year',        cash = 3000, msg = 'This is your year.' },
+        { kind = 'empty',   weight = 15, label = 'Same as last year', msg = 'Maybe next time.' },
+    },
+}
+
+-- One candle per player per day. Add `reward = { cash = 100 }` if you want one; remembrance days work well without.
+Config.Events.memorial = { kind = 'tribute', title = 'A Moment of Remembrance', text = 'Light a candle for those who gave everything.', thanks = 'Thank you for remembering.' }
+Config.Events.veterans = { kind = 'tribute', title = 'Thank a Veteran', text = 'Light a candle for everyone who served.', thanks = 'Thank you for your support.' }
+
+-- ==========================================================================
+-- Ghosts in the world (Halloween). Deliberately conservative:
+--  * a ghost only ever spawns near an online player, and only that player's client creates it (local ped, never networked)
+--  * hard server-wide cap, per-player cooldown, and ghosts keep their distance from each other
+--  * every catch is verified by the server (token, owner, distance, daily cap)
+--  * players can opt out with /halloweenghosts
+-- ==========================================================================
+Config.Ghosts = {
+    enabled = true,
+    interval = { 45, 120 },    -- seconds between spawn attempts (server-wide; one ghost per attempt at most)
+    maxActive = 10,            -- ghosts alive on the whole server at once
+    playerCooldown = 150,      -- seconds before the same player can be haunted again
+    radius = { 25.0, 60.0 },   -- how far from the player a ghost appears
+    minSeparation = 120.0,     -- ghosts keep at least this far from each other
+    lifetime = 240,            -- seconds before an uncaught ghost fades away
+    catchRadius = 30.0,        -- server-side distance tolerance when catching
+    nightOnly = true,          -- only between 20:00 and 06:00 on the in-game clock (checked on the client)
+    skipVehicleSpeed = 8.0,    -- m/s; fast drivers are left alone
+    model = 'u_m_y_zombie_01', alpha = 100, light = { 120, 200, 255 },
 }
