@@ -174,7 +174,7 @@ function renderResults(ev) {
   const line = prize ? (prize.claimed ? `You placed ${ordinal(prize.place)}. Your prize has been claimed. Well played.` : `You placed ${ordinal(prize.place)}. Claim your prize before the season ends.`)
     : c.points > 0 ? `The contest is over. You finished #${c.rank} with ${ptsText(c.points)}.` : 'The contest is over. Thanks to everyone who played.';
   const btn = prize ? `<button class="grace ${prize.claimed ? 'done' : 'ready'}" ${prize.claimed ? 'disabled' : 'data-arg="8"'}>${prize.claimed ? 'Prize claimed' : `Claim ${esc(prize.label)}`}</button>` : '';
-  main.innerHTML = `<div class="scene sc-halloween results"><i class="fog"></i><img class="trophy" src="img/halloween/trophy.svg" alt=""><div class="podium">${pod}</div></div>
+  main.innerHTML = `<div class="scene sc-halloween results"><i class="fog"></i><img class="trophy" src="img/halloween/trophy.webp" alt=""><div class="podium">${pod}</div></div>
     <div class="progress"><div class="row"><p>${line}</p>${btn}</div></div>`;
 }
 

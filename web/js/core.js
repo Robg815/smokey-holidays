@@ -64,8 +64,8 @@ function theme(t) {
 const EXPERIENCES = {}; // kind -> render(event)
 
 const HAS_ART = new Set(['christmas', 'halloween', 'valentines', 'easter', 'stpatricks', 'independence', 'thanksgiving', 'new_years_eve', 'new_years', 'memorial', 'labor']); // every holiday has its own art
-const emblemSrc = (id) => `img/${HAS_ART.has(id) ? id : 'default'}/emblem.svg`; // holidays without custom art share the default badge
-const heroSrc = (id) => HAS_ART.has(id) ? `img/${id}/scene.svg` : 'img/default/hero.svg';
+const emblemSrc = (id) => `img/${HAS_ART.has(id) ? id : 'default'}/emblem.webp`; // holidays without custom art share the default badge
+const heroSrc = (id) => HAS_ART.has(id) ? `img/${id}/scene.webp` : 'img/default/hero.webp';
 
 function setEmblem(id) {
   if (id) emblem.src = emblemSrc(id);
@@ -138,14 +138,14 @@ function renderEmpty(s) { // observance days and quiet stretches
   syncSkinBtn(null);
   const next = s.upcoming[0];
   if (next) setStats([{ icon: 'calendar', label: 'Next up', value: when(next.daysUntil) }]);
-  main.innerHTML = `<div class="empty"><img src="img/rewards/star.svg" alt=""><h3>${s.active.length ? 'Enjoy the day' : 'A quiet stretch'}</h3>
+  main.innerHTML = `<div class="empty"><img src="img/rewards/star.webp" alt=""><h3>${s.active.length ? 'Enjoy the day' : 'A quiet stretch'}</h3>
     <p>${next ? `${esc(next.label)} is ${when(next.daysUntil).toLowerCase()}. Special events open here when the day gets close.` : 'Check back soon.'}</p></div>`;
 }
 
-/* Reward art by outcome kind (img/rewards/*.svg); anything unknown gets the star */
+/* Reward art by outcome kind (img/rewards/*.webp); anything unknown gets the star */
 const REWARD_ART = { treat: 'candy', trick: 'scare', ghost: 'ghost', empty: 'empty', dud: 'empty', gift: 'gift', basket: 'gift', cash: 'coins', coins: 'coins', egg: 'coins',
   golden: 'coins', jackpot: 'coins', lucky: 'coins', burst: 'star', finale: 'star', door: 'gift', dish: 'gift', candle: 'star', punch: 'coins' };
-const rewardSrc = (kind) => kind === 'prize' ? 'img/halloween/trophy.svg' : `img/rewards/${REWARD_ART[kind] || 'star'}.svg`;
+const rewardSrc = (kind) => kind === 'prize' ? 'img/halloween/trophy.webp' : `img/rewards/${REWARD_ART[kind] || 'star'}.webp`;
 
 function reveal({ head, label, sub, kind, points }) {
   const rig = $('.rig'); rig.querySelector('.reveal')?.remove();

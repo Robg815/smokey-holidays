@@ -8,7 +8,8 @@ a different experience per major holiday, and an admin test panel. **The server 
 - NUI is plain HTML/CSS/JS: no framework, no bundler, no runtime npm deps, no remote assets. System fonts only
   (Bahnschrift for display text and numbers, Segoe UI for body; both ship with Windows, which is what FiveM runs on).
   FiveM's embedded Chromium can lag behind desktop Chrome, so avoid brand-new CSS/JS features.
-- All artwork is original SVG (`web/img`). Never add copyrighted art or reference photos to the repo.
+- All artwork is original and generated in-repo: painted WebP scenes, emblems and rewards from `dev/paint.py` and
+  `dev/paint_icons.py` (procedural numpy rendering), plus a few SVGs from `dev/art.py`. Never add copyrighted art or reference photos.
 - This code has only been exercised through the browser preview and a mock server. It has **not** been run in-game yet.
 
 ## Repo map
@@ -28,8 +29,9 @@ client/events.lua  `play` NUI callback          client/admin.lua  /holidayadmin 
 web/index.html     one shell; css/{base,advent,events,admin}.css; js/{core,advent,events,hub,admin,preview}.js
   js/hub.js renders the city hub (default); js/events.js holds the old in-menu games (Config.MenuGames = true)
   js/preview-world.js is GENERATED from config_world.lua by `lua5.4 dev/export_world.lua` (smoke.py checks it)
-web/img/<id>/{emblem,scene}.svg   per-holiday art;  web/img/door*.svg advent door art;  web/img/default/ shared emblem
-dev/               art.py (regenerates the SVG art), shot.py (screenshots), smoke.py (click-through test)
+web/img/<id>/{emblem,scene}.webp  per-holiday art;  web/img/door*.svg advent door art;  web/img/default/ shared emblem
+dev/               paint.py (painted scenes), paint_icons.py (emblems, rewards, trophy), art.py (brand, tablet wallpaper,
+                   Halloween map SVGs), shot.py (screenshots), smoke.py (click-through test)
 docs/halloween-contest.md   spec and contracts for the month-long Halloween contest (implemented)
 ```
 
@@ -39,7 +41,10 @@ pip install -r dev/requirements.txt && playwright install chromium   # once
 python dev/smoke.py              # click-through test, must pass before you finish
 python dev/sim.py                # real server + client Lua against FiveM/ox_lib/Qbox stand-ins + SQLite; must pass after Lua changes
 python dev/shot.py [id ...]      # PNGs in web/screenshots/ (no args = everything + contact sheet)
-python dev/art.py                # regenerate SVG scenes/emblems (deterministic)
+python dev/paint.py [id ...]     # repaint scene.webp (deterministic, ~1-2 min each; needs numpy + scipy)
+PAINT_SS=0.5 PAINT_OUT=/tmp/draft python dev/paint.py <id>   # quick low-res draft into another folder
+python dev/paint_icons.py        # emblems, rewards, trophy (.webp)
+python dev/art.py                # brand, admin wallpaper, Halloween map (SVG)
 node --check web/js/*.js         # quick syntax check
 lua5.4 dev/dates_test.lua        # date rules (Easter, nth/last weekday, observed days, windows)
 lua5.4 dev/export_world.lua      # regenerate web/js/preview-world.js after editing config_world.lua
@@ -83,7 +88,7 @@ observances (so Halloween keeps the headline on Columbus Day). Quick check: `lua
 ## Look and feel (keep it)
 - Modern dark glass dashboard (the style current FiveM UIs use): app window with a title bar, a hero header that shows the
   holiday's scene art behind a gradient, stat cards (`setStats`), sidebar cards (`setExtra`), rounded scenes and a toast.
-  Holidays only change the accent tokens; the line icon set is `ICON` in `js/core.js`, reward art is `img/rewards/*.svg`.
+  Holidays only change the accent tokens; the line icon set is `ICON` in `js/core.js`, reward art is `img/rewards/*.webp`.
 - Halloween in the UI: the street is dark (`.lights-out`); the cursor is a flashlight beam and ghosts are trapped by holding
   the beam on them (no clicking). The admin panel is a tablet (bezel, status bar, tabs: overview, holidays, time, halloween).
 - Restrained motion, one orchestrated entrance, glow only on interactive or ready things.
@@ -93,7 +98,7 @@ observances (so Halloween keeps the headline on Columbus Day). Quick check: `lua
   (it runs on re-render and on hide). Never leave timers running while the UI is closed.
 
 ## Status
-Done: advent (wood + holo), 11 holiday experiences, per-holiday SVG art, admin panel, event engine, smoke tests,
+Done: advent (wood + holo), 11 holiday experiences, per-holiday painted art (WebP), admin panel, event engine, smoke tests,
 date rules, client UI bridge, month-long Halloween contest (leaderboard, podium, prize claim), world ghosts caught with
 flashlights, 21 city activities across the 11 major holidays (config_world.lua), city hub menu, tablet admin panel with a City tab.
 Simulated end to end (dev/sim.py) but not yet run in GTA; docs/live-test.md is the first-run checklist. Read `docs/halloween-contest.md` before touching Halloween. Update this section when status changes.

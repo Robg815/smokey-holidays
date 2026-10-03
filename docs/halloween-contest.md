@@ -54,12 +54,12 @@ Everything below is implemented. The Lua has not been run in-game yet; use the t
     Progress line adds `Your score: N pts, rank #R`, plus the hint and `Ghosts caught today: today/cap` from `ev.world`.
   - `renderBoard`: sidebar becomes "Leaderboard" (top 5, your row pinned below with a dashed border if you are outside the top 5),
     and `#countdown` shows `Ends in 12 days` / `Ends in 5h 12m` / `Contest closed`.
-  - `renderResults`: podium (2nd, 1st, 3rd) over the Halloween backdrop with `img/halloween/trophy.svg`; a claim button
+  - `renderResults`: podium (2nd, 1st, 3rd) over the Halloween backdrop with `img/halloween/trophy.webp`; a claim button
     (`class="grace ready" data-arg="8"`) when `ev.contest.prize && !claimed`.
   - Click handler: `arg = ... p.dataset.arg ? +p.dataset.arg : ...`; for `arg === 8` mark claimed, re-render, and `reveal`. After a normal play,
     merge `res.contest` (board, points, rank) into `ev.contest` and show `+N pts` in the toast/reveal.
 - [x] `css/events.css`: `#upcoming.board` list (rank medals, `.you`, `.gap`; neutralize the timeline dots with `content: none`), `.results`, `.podium`, `.pod`.
-- [x] Art: `web/img/halloween/trophy.svg` (original: golden cup topped with a pumpkin). Add it to `dev/art.py`.
+- [x] Art: `web/img/halloween/trophy.webp` (original: golden cup topped with a pumpkin). Add it to `dev/art.py`.
 - [x] `js/admin.js` and `css/admin.css`: header shows `Ghosts active n/max`; Tools row with Spawn ghost near me, Clear ghosts,
       +100 points, and Reset contest (two-step confirm: first click changes the label to "Click again to confirm").
 - [x] `js/preview.js`: halloween preview gets `contest` + `world`; `?closed` shows winners and an unclaimed prize; mock `play` arg 8; mock the new admin actions.
