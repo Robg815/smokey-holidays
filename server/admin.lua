@@ -19,9 +19,17 @@ do -- restore what was saved (only enabled/disabled and the advent switch persis
     end
 end
 
+-- Whole days the fake clock has run past midnight, so a test that crosses midnight lands on the next day
+local function clockDays()
+    return Admin.clock and (Admin.clock.secs + (os.time() - Admin.clock.base)) // 86400 or 0
+end
+
 function Dates.today()
-    if Admin.date then return Admin.date.y, Admin.date.m, Admin.date.d end
-    return origToday()
+    local y, m, d
+    if Admin.date then y, m, d = Admin.date.y, Admin.date.m, Admin.date.d else y, m, d = origToday() end
+    local roll = clockDays()
+    if roll > 0 then y, m, d = Dates.fromDays(Dates.toDays(y, m, d) + roll) end
+    return y, m, d
 end
 
 local function holidayCfg(id)
@@ -127,6 +135,7 @@ function actions.date(_, d)
     local v = validDate(d.value)
     if not v then return 'Use a valid date (YYYY-MM-DD).' end
     Admin.date = v
+    if Admin.clock then Admin.clock = { secs = Admin.secondsOfDay(), base = os.time() } end -- the new date starts now, keeping the time
     return 'Date override set.'
 end
 

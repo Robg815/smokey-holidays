@@ -15,15 +15,25 @@ local function roll(list)
     return #list, list[#list]
 end
 
+-- Items that do not exist in ox_inventory are skipped (and listed once at startup) instead of blocking the reward:
+-- ox_inventory answers CanCarryItem for an unknown item with nil, which would otherwise read as "inventory full".
+local knownItems = {}
+local function itemExists(name)
+    if knownItems[name] == nil then knownItems[name] = exports.ox_inventory:Items(name) ~= nil end
+    return knownItems[name]
+end
+
 local function canCarry(src, reward)
     for _, it in ipairs(reward.items or {}) do
-        if not exports.ox_inventory:CanCarryItem(src, it.name, it.count) then return false end
+        if itemExists(it.name) and not exports.ox_inventory:CanCarryItem(src, it.name, it.count) then return false end
     end
     return true
 end
 
 local function give(src, reward)
-    for _, it in ipairs(reward.items or {}) do exports.ox_inventory:AddItem(src, it.name, it.count) end
+    for _, it in ipairs(reward.items or {}) do
+        if itemExists(it.name) then exports.ox_inventory:AddItem(src, it.name, it.count) end
+    end
     if reward.cash then exports.qbx_core:AddMoney(src, 'cash', reward.cash, 'holiday-event') end
 end
 
@@ -146,7 +156,7 @@ end
 Events.nameOf, Events.addPoints = nameOf, addPoints
 
 -- Shared building blocks for other server files (server/world.lua). Same rules: roll, check space, claim, pay, score.
-Events.util = { cfgFor = cfgFor, cidOf = cidOf, roll = roll, canCarry = canCarry, give = give, rows = rows, insert = insert, award = award, busy = busy, FULL = FULL }
+Events.util = { itemExists = itemExists, cfgFor = cfgFor, cidOf = cidOf, roll = roll, canCarry = canCarry, give = give, rows = rows, insert = insert, award = award, busy = busy, FULL = FULL }
 
 
 -- A ghost caught out in the world (verified by server/ghosts.lua before this is called)

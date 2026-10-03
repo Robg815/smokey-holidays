@@ -47,6 +47,7 @@ local function spawnProp(model, c)
     SetModelAsNoLongerNeeded(hash)
     if not DoesEntityExist(o) then return end
     PlaceObjectOnGroundProperly(o); FreezeEntityPosition(o, true); SetEntityInvincible(o, true)
+    SetEntityCollision(o, false, false) -- nobody gets stuck on a pumpkin at a doorstep
     return o
 end
 
@@ -84,8 +85,11 @@ local function useSpot(h, a, i, b)
     busy = false
 end
 
+-- Shown when an activity has no marker of its own and its prop model is missing on this server
+local FALLBACK_MARKER = { type = 2, color = { r = 255, g = 211, b = 107, a = 190 }, scale = 0.45 }
+
 local function buildSpots(h, a, b)
-    local mk = a.marker
+    local mk = a.marker or (a.prop and FALLBACK_MARKER)
     for i, c in ipairs(places(a.spots)) do
         if a.blip then
             if a.blip.mode == 'area' then -- show a search area, not the exact spot

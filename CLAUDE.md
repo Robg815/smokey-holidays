@@ -37,6 +37,7 @@ docs/halloween-contest.md   spec and contracts for the month-long Halloween cont
 ```
 pip install -r dev/requirements.txt && playwright install chromium   # once
 python dev/smoke.py              # click-through test, must pass before you finish
+python dev/sim.py                # real server + client Lua against FiveM/ox_lib/Qbox stand-ins + SQLite; must pass after Lua changes
 python dev/shot.py [id ...]      # PNGs in web/screenshots/ (no args = everything + contact sheet)
 python dev/art.py                # regenerate SVG scenes/emblems (deterministic)
 node --check web/js/*.js         # quick syntax check
@@ -95,4 +96,4 @@ observances (so Halloween keeps the headline on Columbus Day). Quick check: `lua
 Done: advent (wood + holo), 11 holiday experiences, per-holiday SVG art, admin panel, event engine, smoke tests,
 date rules, client UI bridge, month-long Halloween contest (leaderboard, podium, prize claim), world ghosts caught with
 flashlights, 21 city activities across the 11 major holidays (config_world.lua), city hub menu, tablet admin panel with a City tab.
-Not yet run in-game. Read `docs/halloween-contest.md` before touching Halloween. Update this section when status changes.
+Simulated end to end (dev/sim.py) but not yet run in GTA; docs/live-test.md is the first-run checklist. Read `docs/halloween-contest.md` before touching Halloween. Update this section when status changes.
